@@ -1,0 +1,17 @@
+{
+    "description": "",
+    "dependencies": {
+        "async": "0.2.x"
+    },
+    "devDependencies": {
+        "mocha": "*"
+    },
+    "keywords": ["asset", "static"],
+    "main": "./lib",
+    "name": "electricity",
+    "repository": "git://github.com/mediocre/electricity.git",
+    "scripts": {
+        "test": "mocha --reporter spec"
+    },
+    "version": "0.0.1"
+}
