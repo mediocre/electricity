@@ -1,17 +1,24 @@
 {
-    "description": "",
-    "dependencies": {
-        "async": "0.2.x"
-    },
-    "devDependencies": {
-        "mocha": "*"
-    },
-    "keywords": ["asset", "static"],
-    "main": "./lib",
-    "name": "electricity",
-    "repository": "git://github.com/mediocre/electricity.git",
-    "scripts": {
-        "test": "mocha --reporter spec"
-    },
-    "version": "0.0.1"
+  "description": "",
+  "dependencies": {
+    "async": "0.2.x",
+    "lru-cache": "^2.5.0",
+    "mime": "^1.2.11"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "keywords": [
+    "asset",
+    "static"
+  ],
+  "main": "./lib",
+  "name": "electricity",
+  "repository": "git://github.com/mediocre/electricity.git",
+  "scripts": {
+    "test": "mocha --reporter spec",
+    "watch": "mocha --reporter spec -w",
+    "app": "node test/app.js"
+  },
+  "version": "0.0.1"
 }
