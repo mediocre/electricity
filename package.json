@@ -6,7 +6,8 @@
     "mime": "^1.2.11"
   },
   "devDependencies": {
-    "mocha": "*"
+    "mocha": "*",
+    "express": "3.x"
   },
   "keywords": [
     "asset",
