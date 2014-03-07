@@ -19,6 +19,11 @@ function setupPassthrough() {
     };
     res = {
         set: function() {},
+        status: function(number) {
+            if (number >= 400) {
+                assert.fail(number, "400", "Failing status code", "<");
+            }
+        },
         send: function() {
             assert.fail('Called send', 'called next', 'Incorrect routing', ', instead');
         }
@@ -53,12 +58,22 @@ describe('electricity.static', function() {
     describe('The middleware', function() {
         it('calls next if the asset does not exist', function(done) {
             next = done;
+            res.status = function(number) {
+                if (number >= 400) {
+                    assert.fail(number, "400", "Failing status code", "<");
+                }
+            };
             midware(req, res, next);
         });
         it('calls res.send with asset contents if the asset does exist', function(done) {
             req.path = '/robots.txt';
             res = {
                 set: function(){},
+                status: function(number) {
+                    if (number >= 400) {
+                        assert.fail(number, "400", "Failing status code", "<");
+                    }
+                },
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
                         assert(data, asset);
@@ -75,6 +90,11 @@ describe('electricity.static', function() {
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
             res = {
                 set: function(){},
+                status: function(number) {
+                    if (number >= 400) {
+                        assert.fail(number, "400", "Failing status code", "<");
+                    }
+                },
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
                         assert(data, asset);
