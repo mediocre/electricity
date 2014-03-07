@@ -7,7 +7,8 @@
   },
   "devDependencies": {
     "mocha": "*",
-    "express": "3.x"
+    "express": "3.x",
+    "buffer-compare": "0.0.1"
   },
   "keywords": [
     "asset",

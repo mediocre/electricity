@@ -1,6 +1,8 @@
 var assert = require('assert');
 var fs = require('fs');
+var zlib = require('zlib');
 var electricity = require('../lib/index');
+var bufCompare = require('buffer-compare');
 var req;
 var res;
 var next;
@@ -15,7 +17,8 @@ function setupPassthrough() {
         method: 'GET',
         app: {
             locals: {}
-        }
+        },
+        get: function() { return ""; }
     };
     res = {
         set: function() {},
@@ -76,7 +79,7 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
-                        assert(data, asset);
+                        assert.equal(0, bufCompare(data, asset));
                         done();
                     });
                 }
@@ -97,8 +100,42 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
-                        assert(data, asset);
+                        assert.equal(0, bufCompare(data, asset));
                         done();
+                    });
+                }
+            };
+            next = function() {
+                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+        it('should gzip the asset contents and send correct encoding header if the client accepts it', function(done) {
+            req.path = '/robots.txt';
+            req.get = function(header) {
+                if (header == "Accept-encoding") {
+                    return "gzip, deflate";
+                }
+            };
+            var headerSet = false;
+            res = {
+                set: function(header, value){
+                    if (header == "Content-encoding" && value == "gzip") {
+                        headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number >= 400) {
+                        assert.fail(number, "400", "Failing status code", "<");
+                    }
+                },
+                send: function(asset) {
+                    fs.readFile('test/public/robots.txt', function(err, data) {
+                        zlib.gzip(data, function(err, zippedAsset) {
+                            assert.equal(0, bufCompare(zippedAsset, asset));
+                            assert(headerSet);
+                            done();
+                        });
                     });
                 }
             };
@@ -112,7 +149,7 @@ describe('electricity.static', function() {
                 locals: {}
             };
             next = function() {
-                assert('function', typeof req.app.locals.electricity.url);
+                assert.equal('function', typeof req.app.locals.electricity.url);
                 done();
             };
             midware(req,res,next);
@@ -123,11 +160,11 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
         it('should append the hash of an asset if the asset is present', function(done) {
-            assert('robots-ca121b5d03245bf82db00d14cee04e22.txt', req.app.locals.electricity.url('robots.txt'));
+            assert.equal('robots-ca121b5d03245bf82db00d14cee04e22.txt', req.app.locals.electricity.url('robots.txt'));
             done();
         });
         it('should leave the path alone if the asset is not present', function(done) {
-            assert('notthere.png', req.app.locals.electricity.url('notthere.png'));
+            assert.equal('notthere.png', req.app.locals.electricity.url('notthere.png'));
             done();
         });
     });
