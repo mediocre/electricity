@@ -110,7 +110,8 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
-        it('should gzip the asset contents and send correct encoding header if the client accepts it', function(done) {
+
+        it.skip('should gzip the asset contents and send correct encoding header if the client accepts it', function(done) {
             req.path = '/robots.txt';
             req.get = function(header) {
                 if (header == "Accept-encoding") {
@@ -144,6 +145,7 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+        
         it('registers an EJS helper', function(done) {
             req.app = {
                 locals: {}

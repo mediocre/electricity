@@ -1,9 +1,7 @@
 {
   "description": "",
   "dependencies": {
-    "async": "0.2.x",
-    "lru-cache": "^2.5.0",
-    "mime": "^1.2.11"
+    "mime": "1.2.x"
   },
   "devDependencies": {
     "mocha": "*",
@@ -18,9 +16,9 @@
   "name": "electricity",
   "repository": "git://github.com/mediocre/electricity.git",
   "scripts": {
+    "app": "node test/app.js",
     "test": "mocha --reporter spec",
-    "watch": "mocha --reporter spec -w",
-    "app": "node test/app.js"
+    "watch": "mocha --reporter spec -w"
   },
   "version": "0.0.1"
 }
