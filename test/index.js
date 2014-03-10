@@ -191,6 +191,50 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
 
+        it('should return status 304 if the ETag matches', function(done) {
+            var headerSet = false;
+            var statusSet = false;
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+            req.get = function(header) {
+                if (header === 'If-None-Match') {
+                    return 'ca121b5d03245bf82db00d14cee04e22';
+                }
+            };
+            res = {
+                set: function(headers) {
+                    var mtime = fs.statSync('test/public/robots.txt').mtime;
+                    if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
+                        headers['Content-Type'] === 'text/plain' &&
+                        headers['Content-Length'] == '13' &&
+                        headers['Cache-Control'] === 'public, max-age=31536000' &&
+                        headers['Last-Modified'] === mtime.toUTCString()) {
+
+                            headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number === 304) {
+                        statusSet = true;
+                    }
+                    else {
+                        assert.fail(number, 304, 'Wrong status');
+                    }
+                },
+                send: function(asset) {
+                    assert.fail(asset, '', 'Should not send content');
+                },
+                end: function() {
+                    assert(statusSet, 'Status was not set correctly');
+                    assert(headerSet, 'Headers were not set correctly');
+                    done();
+                }
+            };
+            next = function() {
+                assert.fail('Called next', 'called end', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
         it.skip('should gzip the asset contents and send correct encoding header if the client accepts it', function(done) {
             req.path = '/robots.txt';
             req.get = function(header) {
