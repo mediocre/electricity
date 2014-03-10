@@ -281,16 +281,24 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
     });
+
     describe('The url helper', function() {
         beforeEach(function() {
-            midware(req,res,next);
+            midware(req, res, next);
         });
+
         it('should append the hash of an asset if the asset is present', function(done) {
-            assert.equal('robots-ca121b5d03245bf82db00d14cee04e22.txt', req.app.locals.electricity.url('robots.txt'));
+            assert.equal(req.app.locals.electricity.url('robots.txt'), 'robots-ca121b5d03245bf82db00d14cee04e22.txt');
             done();
         });
+
         it('should leave the path alone if the asset is not present', function(done) {
-            assert.equal('notthere.png', req.app.locals.electricity.url('notthere.png'));
+            assert.equal(req.app.locals.electricity.url('nope.gif'), 'nope.gif');
+            done();
+        });
+
+        it.skip('should prepend the hostname if specified', function(done) {
+            assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
             done();
         });
     });
