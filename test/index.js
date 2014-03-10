@@ -134,11 +134,6 @@ describe('electricity.static', function() {
         it('sends a 302 redirect if the hash does not match the current file', function(done) {
             var redirected = false;
             req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
-            req.get = function(header) {
-                if (header == 'Host') {
-                    return 'test.com';
-                }
-            }
             res = {
                 redirect: function(url) {
                     if (url === '/robots-ca121b5d03245bf82db00d14cee04e22.txt') {
@@ -164,11 +159,6 @@ describe('electricity.static', function() {
             var statusSet = false;
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
             req.method = 'HEAD';
-            req.get = function(header) {
-                if (header == 'Host') {
-                    return 'test.com';
-                }
-            };
             res = {
                 set: function(headers) {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
