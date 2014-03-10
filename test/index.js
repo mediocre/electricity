@@ -110,6 +110,27 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+        it('correctly serves files from subdirectories', function(done) {
+            req.path = '/styles/normalize-dc691d63a0d03f7c0dba9f0eda398b5b.css';
+            res = {
+                set: function(){},
+                status: function(number) {
+                    if (number >= 400) {
+                        assert.fail(number, '400', 'Failing status code', '<');
+                    }
+                },
+                send: function(asset) {
+                    fs.readFile('test/public/styles/normalize.css', function(err, data) {
+                        assert.equal(0, bufCompare(data, asset));
+                        done();
+                    });
+                }
+            };
+            next = function() {
+                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
         it('sends a 302 redirect if the hash does not match the current file', function(done) {
             var redirected = false;
             req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
