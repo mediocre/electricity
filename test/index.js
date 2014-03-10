@@ -68,7 +68,7 @@ describe('electricity.static', function() {
             };
             midware(req, res, next);
         });
-        it('calls res.send with asset contents if the asset does exist', function(done) {
+        it.skip('calls res.send with asset contents if the asset does exist', function(done) {
             req.path = '/robots.txt';
             res = {
                 set: function(){},
@@ -103,6 +103,40 @@ describe('electricity.static', function() {
                         assert.equal(0, bufCompare(data, asset));
                         done();
                     });
+                }
+            };
+            next = function() {
+                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+        it('sends a 302 redirect if the hash does not match the current file', function(done) {
+            var headerSet = false;
+            var statusSet = false;
+            req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
+            req.get = function(header) {
+                if (header == "Host") {
+                    return 'test.com';
+                }
+            }
+            res = {
+                set: function(header, value) {
+                    if (header == 'Location' && value == 'http://test.com/robots-ca121b5d03245bf82db00d14cee04e22.txt') {
+                        headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number === 302) {
+                        statusSet = true;
+                    }
+                },
+                send: function(asset) {
+                    assert.fail(asset, "", "Should not send");
+                },
+                end: function() {
+                    assert(headerSet, "Location header was not set correctly");
+                    assert(statusSet, "Status was not set correctly");
+                    done();
                 }
             };
             next = function() {
@@ -145,7 +179,7 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
-        
+
         it('registers an EJS helper', function(done) {
             req.app = {
                 locals: {}
