@@ -30,7 +30,7 @@ function setupPassthrough() {
         send: function() {
             assert.fail('Called send', 'called next', 'Incorrect routing', ', instead');
         }
-    }
+    };
 }
 
 describe('electricity.static', function() {
