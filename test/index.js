@@ -18,13 +18,13 @@ function setupPassthrough() {
         app: {
             locals: {}
         },
-        get: function() { return ""; }
+        get: function() { return ''; }
     };
     res = {
         set: function() {},
         status: function(number) {
             if (number >= 400) {
-                assert.fail(number, "400", "Failing status code", "<");
+                assert.fail(number, '400', 'Failing status code', '<');
             }
         },
         send: function() {
@@ -63,7 +63,7 @@ describe('electricity.static', function() {
             next = done;
             res.status = function(number) {
                 if (number >= 400) {
-                    assert.fail(number, "400", "Failing status code", "<");
+                    assert.fail(number, '400', 'Failing status code', '<');
                 }
             };
             midware(req, res, next);
@@ -74,7 +74,7 @@ describe('electricity.static', function() {
                 set: function(){},
                 status: function(number) {
                     if (number >= 400) {
-                        assert.fail(number, "400", "Failing status code", "<");
+                        assert.fail(number, '400', 'Failing status code', '<');
                     }
                 },
                 send: function(asset) {
@@ -95,7 +95,7 @@ describe('electricity.static', function() {
                 set: function(){},
                 status: function(number) {
                     if (number >= 400) {
-                        assert.fail(number, "400", "Failing status code", "<");
+                        assert.fail(number, '400', 'Failing status code', '<');
                     }
                 },
                 send: function(asset) {
@@ -115,7 +115,7 @@ describe('electricity.static', function() {
             var statusSet = false;
             req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
             req.get = function(header) {
-                if (header == "Host") {
+                if (header == 'Host') {
                     return 'test.com';
                 }
             }
@@ -131,11 +131,50 @@ describe('electricity.static', function() {
                     }
                 },
                 send: function(asset) {
-                    assert.fail(asset, "", "Should not send");
+                    assert.fail(asset, '', 'Should not send');
                 },
                 end: function() {
-                    assert(headerSet, "Location header was not set correctly");
-                    assert(statusSet, "Status was not set correctly");
+                    assert(headerSet, 'Location header was not set correctly');
+                    assert(statusSet, 'Status was not set correctly');
+                    done();
+                }
+            };
+            next = function() {
+                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
+        it('should only send a status code and correct headers on HEAD request', function(done) {
+            var headerSet = false;
+            var statusSet = false;
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+            req.method = 'HEAD';
+            req.get = function(header) {
+                if (header == 'Host') {
+                    return 'test.com';
+                }
+            };
+            res = {
+                set: function(headers) {
+                    if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
+                        headers['Content-Type'] === 'text/plain' &&
+                        headers['Content-Length'] == '13') {
+
+                            headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number === 200) {
+                        statusSet = true;
+                    }
+                },
+                send: function(asset) {
+                    assert.fail(asset, '', 'Should not send content');
+                },
+                end: function() {
+                    assert(statusSet, 'Status was not set correctly');
+                    assert(headerSet, 'Headers were not set correctly');
                     done();
                 }
             };
@@ -148,20 +187,20 @@ describe('electricity.static', function() {
         it.skip('should gzip the asset contents and send correct encoding header if the client accepts it', function(done) {
             req.path = '/robots.txt';
             req.get = function(header) {
-                if (header == "Accept-encoding") {
-                    return "gzip, deflate";
+                if (header == 'Accept-encoding') {
+                    return 'gzip, deflate';
                 }
             };
             var headerSet = false;
             res = {
                 set: function(header, value){
-                    if (header == "Content-encoding" && value == "gzip") {
+                    if (header == 'Content-encoding' && value == 'gzip') {
                         headerSet = true;
                     }
                 },
                 status: function(number) {
                     if (number >= 400) {
-                        assert.fail(number, "400", "Failing status code", "<");
+                        assert.fail(number, '400', 'Failing status code', '<');
                     }
                 },
                 send: function(asset) {
