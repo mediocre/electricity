@@ -111,8 +111,7 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
         it('sends a 302 redirect if the hash does not match the current file', function(done) {
-            var headerSet = false;
-            var statusSet = false;
+            var redirected = false;
             req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
             req.get = function(header) {
                 if (header == 'Host') {
@@ -120,22 +119,16 @@ describe('electricity.static', function() {
                 }
             }
             res = {
-                set: function(header, value) {
-                    if (header == 'Location' && value == 'http://test.com/robots-ca121b5d03245bf82db00d14cee04e22.txt') {
-                        headerSet = true;
-                    }
-                },
-                status: function(number) {
-                    if (number === 302) {
-                        statusSet = true;
+                redirect: function(url) {
+                    if (url === '/robots-ca121b5d03245bf82db00d14cee04e22.txt') {
+                        redirected = true;
                     }
                 },
                 send: function(asset) {
                     assert.fail(asset, '', 'Should not send');
                 },
                 end: function() {
-                    assert(headerSet, 'Location header was not set correctly');
-                    assert(statusSet, 'Status was not set correctly');
+                    assert(redirected, 'Redirect was not set correctly');
                     done();
                 }
             };
