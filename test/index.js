@@ -58,6 +58,7 @@ describe('electricity.static', function() {
         done();
     });
     it('should throw if permissions are insufficent');
+
     describe('with options', function() {
         it('throws an error if the hostname is not falsy or a string', function() {
 
@@ -78,6 +79,7 @@ describe('electricity.static', function() {
             electricity.static('test/public', { hostname: undefined });
         });
     });
+
     describe('The middleware', function() {
         it('calls next if the asset does not exist', function(done) {
             next = done;
@@ -515,6 +517,66 @@ describe('electricity.static', function() {
                 done();
             };
             midware(req,res,next);
+        });
+    });
+
+    describe('The file watcher', function() {
+        it('should create a cache entry when a file is created', function(done) {
+            fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function (err) {
+                if(err) throw err;
+                req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/watchTest.txt', function(err, data) {
+                            assert.equal(bufCompare(data, asset), 0);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midware(req, res, next);
+            });
+        });
+
+        it('should update a cache entry when a file is changed', function(done) {
+            fs.appendFile('test/public/watchTest.txt', 'MORE DATA', function(err) {
+                req.path = '/watchTest-1e32064011ba3a640cfb0174a0ed9a97.txt';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/watchTest.txt', function(err, data) {
+                            assert.equal(bufCompare(data, asset), 0);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midware(req, res, next);
+            });
+        });
+
+        it('should remove a cache entry when a file is deleted', function(done) {
+            fs.unlink('test/public/watchTest.txt', function(err) {
+                setupPassthrough();
+                next = done;
+                req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
+                midware(req, res, next);
+            });
         });
     });
 
