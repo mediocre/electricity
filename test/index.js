@@ -58,6 +58,26 @@ describe('electricity.static', function() {
         done();
     });
     it('should throw if permissions are insufficent');
+    describe('with options', function() {
+        it('throws an error if the hostname is not falsy or a string', function() {
+
+            assert.throws(function() {
+                electricity.static('test/public', { hostname: {} });
+            });
+            assert.throws(function() {
+                electricity.static('test/public', { hostname: 35 });
+            });
+            assert.throws(function() {
+                electricity.static('test/public', { hostname: function() {} });
+            });
+            assert.throws(function() {
+                electricity.static('test/public', { hostname: [] });
+            });
+
+            //Should succeed
+            electricity.static('test/public', { hostname: undefined });
+        });
+    });
     describe('The middleware', function() {
         it('calls next if the asset does not exist', function(done) {
             next = done;
