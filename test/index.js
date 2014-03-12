@@ -260,7 +260,11 @@ describe('electricity.static', function() {
                     statusSet = true;
                 },
                 send: function(asset) {
-                    assert.fail(asset, '', 'Should not send content');
+                    if(asset === 304) {
+                        done();
+                    } else {
+                        assert.fail(asset, '', 'Should not send content');
+                    }
                 },
                 end: function() {
                     assert(statusSet, 'Status was not set correctly');
@@ -383,7 +387,11 @@ describe('electricity.static', function() {
                     statusSet = true;
                 },
                 send: function(asset) {
-                    assert.fail(asset, '', 'Should not send content');
+                    if(asset === 304) {
+                        done();
+                    } else {
+                        assert.fail(asset, '', 'Should not send content');
+                    }
                 },
                 end: function() {
                     assert(statusSet, 'Status was not set correctly');
