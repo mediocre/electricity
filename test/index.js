@@ -121,7 +121,7 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/styles/normalize.css', function(err, data) {
-                        assert.equal(bufCompare(data, asset));
+                        assert.equal(bufCompare(data, asset), 0);
                         done();
                     });
                 }
