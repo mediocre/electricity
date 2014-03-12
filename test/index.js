@@ -180,13 +180,13 @@ describe('electricity.static', function() {
                     if (url === '/robots-ca121b5d03245bf82db00d14cee04e22.txt') {
                         redirected = true;
                     }
+                    done();
                 },
                 send: function(asset) {
                     assert.fail(asset, '', 'Should not send');
                 },
                 end: function() {
                     assert(redirected, 'Redirect was not set correctly');
-                    done();
                 }
             };
             next = function() {
