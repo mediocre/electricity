@@ -20,5 +20,5 @@
     "test": "mocha --reporter spec",
     "watch": "mocha --reporter spec -w"
   },
-  "version": "0.0.1"
+  "version": "0.0.2"
 }
