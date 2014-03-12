@@ -130,6 +130,27 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+        it('should only remove the hash from the path', function(done) {
+            req.path = '/robots-abc1de.home-ca121b5d03245bf82db00d14cee04e22.txt';
+            res = {
+                set: function(){},
+                status: function(number) {
+                    if (number >= 400) {
+                        assert.fail(number, '400', 'Failing status code', '<');
+                    }
+                },
+                send: function(asset) {
+                    fs.readFile('test/public/robots-abc1de.home.txt', function(err, data) {
+                        assert.equal(bufCompare(data, asset), 0);
+                        done();
+                    });
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
         it('correctly serves files from subdirectories', function(done) {
             req.path = '/styles/normalize-dc691d63a0d03f7c0dba9f0eda398b5b.css';
             res = {
@@ -306,6 +327,12 @@ describe('electricity.static', function() {
         it('should append the hash of an asset if the asset is present', function(done) {
             midware(req, res, next);
             assert.equal(req.app.locals.electricity.url('/robots.txt'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+            done();
+        });
+
+        it('should insert the hash in the correct place', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('/robots-abc1de.home.txt'), '/robots-abc1de.home-ca121b5d03245bf82db00d14cee04e22.txt');
             done();
         });
 
