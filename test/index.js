@@ -254,12 +254,8 @@ describe('electricity.static', function() {
                     }
                 },
                 status: function(number) {
-                    if (number === 304) {
-                        statusSet = true;
-                    }
-                    else {
-                        assert.fail(number, 304, 'Wrong status');
-                    }
+                    assert.equal(number, 304, 'Wrong status: ' + number);
+                    statusSet = true;
                 },
                 send: function(asset) {
                     assert.fail(asset, '', 'Should not send content');
@@ -298,12 +294,8 @@ describe('electricity.static', function() {
                     }
                 },
                 status: function(number) {
-                    if (number === 200) {
-                        statusSet = true;
-                    }
-                    else {
-                        assert.fail(number, 200, 'Wrong status');
-                    }
+                    assert.equal(number, 200, 'Wrong status: ' + number);
+                    statusSet = true;
                 },
                 send: function(asset) {
                     assert(statusSet, 'Status was not set correctly');
@@ -343,12 +335,8 @@ describe('electricity.static', function() {
                     }
                 },
                 status: function(number) {
-                    if (number === 304) {
-                        statusSet = true;
-                    }
-                    else {
-                        assert.fail(number, 304, 'Wrong status');
-                    }
+                    assert.equal(number, 304, 'Wrong status: ' + number);
+                    statusSet = true;
                 },
                 send: function(asset) {
                     assert.fail(asset, '', 'Should not send content');
@@ -389,12 +377,8 @@ describe('electricity.static', function() {
                     }
                 },
                 status: function(number) {
-                    if (number === 304) {
-                        statusSet = true;
-                    }
-                    else {
-                        assert.fail(number, 304, 'Wrong status');
-                    }
+                    assert.equal(number, 304, 'Wrong status: ' + number);
+                    statusSet = true;
                 },
                 send: function(asset) {
                     assert.fail(asset, '', 'Should not send content');
@@ -435,12 +419,8 @@ describe('electricity.static', function() {
                     }
                 },
                 status: function(number) {
-                    if (number === 200) {
-                        statusSet = true;
-                    }
-                    else {
-                        assert.fail(number, 200, 'Wrong status');
-                    }
+                    assert.equal(number, 200, 'Wrong status: ' + number);
+                    statusSet = true;
                 },
                 send: function(asset) {
                     assert(headerSet, 'Headers were not set correctly');
