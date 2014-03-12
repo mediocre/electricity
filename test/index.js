@@ -479,6 +479,33 @@ describe('electricity.static', function() {
         it('should gzip the asset contents and send correct encoding header if the client accepts it', gzipTest);
         it('should still send gzipped contents after gzipped content is cached', gzipTest);
 
+        it('should not gzip non-whitelisted MIME types', function(done) {
+            req.path = '/apple-touch-icon-precomposed-ed47dd1fd0256fec0480adc1c03f9ef3.png';
+            req.get = function(header) {
+                if (header == 'Accept-Encoding') {
+                    return 'gzip, deflate';
+                }
+            };
+            res = {
+                set: function(){},
+                status: function(number) {
+                    if (number >= 400) {
+                        assert.fail(number, '400', 'Failing status code', '<');
+                    }
+                },
+                send: function(asset) {
+                    fs.readFile('test/public/apple-touch-icon-precomposed.png', function(err, data) {
+                        assert.equal(bufCompare(data, asset), 0);
+                        done();
+                    });
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
         it('registers an EJS helper', function(done) {
             req.app = {
                 locals: {}
