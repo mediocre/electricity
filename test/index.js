@@ -164,11 +164,11 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
-                        headers['Cache-Control'] === 'public, max-age=31536000' &&
-                        headers['Last-Modified'] === mtime.toUTCString()) {
+                            headers['Content-Length'] == '13' &&
+                                headers['Cache-Control'] === 'public, max-age=31536000' &&
+                                    headers['Last-Modified'] === mtime.toUTCString()) {
 
-                            headerSet = true;
+                        headerSet = true;
                     }
                 },
                 status: function(number) {
@@ -205,11 +205,11 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
-                        headers['Cache-Control'] === 'public, max-age=31536000' &&
-                        headers['Last-Modified'] === mtime.toUTCString()) {
+                            headers['Content-Length'] == '13' &&
+                                headers['Cache-Control'] === 'public, max-age=31536000' &&
+                                    headers['Last-Modified'] === mtime.toUTCString()) {
 
-                            headerSet = true;
+                        headerSet = true;
                     }
                 },
                 status: function(number) {
@@ -283,23 +283,38 @@ describe('electricity.static', function() {
     });
 
     describe('The url helper', function() {
-        beforeEach(function() {
+        it('should append the hash of an asset if the asset is present', function(done) {
             midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('/robots.txt'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+            done();
         });
 
-        it('should append the hash of an asset if the asset is present', function(done) {
-            assert.equal(req.app.locals.electricity.url('robots.txt'), 'robots-ca121b5d03245bf82db00d14cee04e22.txt');
+        it('should fix relative paths to the route assets are served from', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('robots.txt'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
             done();
         });
 
         it('should leave the path alone if the asset is not present', function(done) {
+            midware(req, res, next);
             assert.equal(req.app.locals.electricity.url('nope.gif'), 'nope.gif');
             done();
         });
 
-        it.skip('should prepend the hostname if specified', function(done) {
-            assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
-            done();
+        describe('with the hostname option', function() {
+            it('should prepend the hostname if specified', function(done) {
+                var cdnMidware = electricity.static('test/public', { hostname: 'cdn.example.com' });
+                cdnMidware(req, res, next);
+                assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+                done();
+            });
+
+            it('should handle hostnames with trailing slashes', function(done) {
+                var cdnMidware = electricity.static('test/public', { hostname: 'cdn.example.com/' });
+                cdnMidware(req, res, next);
+                assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+                done();
+            });
         });
     });
 });
