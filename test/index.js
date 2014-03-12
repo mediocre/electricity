@@ -246,9 +246,9 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                            headers['Content-Length'] == '13' &&
-                                headers['Cache-Control'] === 'public, max-age=31536000' &&
-                                    headers['Last-Modified'] === mtime.toUTCString()) {
+                        headers['Content-Length'] == '13' &&
+                        headers['Cache-Control'] === 'public, max-age=31536000' &&
+                        headers['Last-Modified'] === mtime.toUTCString()) {
 
                         headerSet = true;
                     }
@@ -272,6 +272,187 @@ describe('electricity.static', function() {
             };
             next = function() {
                 assert.fail('called next', 'called end', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
+        it('should send content if the ETag does not match', function(done) {
+            var headerSet = false;
+            var statusSet = false;
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+            req.get = function(header) {
+                if (header === 'If-None-Match') {
+                    return 'da121b5d03245bf82db00d14cee04e22';
+                }
+            };
+            res = {
+                set: function(headers) {
+                    var mtime = fs.statSync('test/public/robots.txt').mtime;
+                    if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
+                        headers['Content-Type'] === 'text/plain' &&
+                        headers['Content-Length'] == '13' &&
+                        headers['Cache-Control'] === 'public, max-age=31536000' &&
+                        headers['Last-Modified'] === mtime.toUTCString()) {
+
+                        headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number === 200) {
+                        statusSet = true;
+                    }
+                    else {
+                        assert.fail(number, 200, 'Wrong status');
+                    }
+                },
+                send: function(asset) {
+                    assert(statusSet, 'Status was not set correctly');
+                    assert(headerSet, 'Headers were not set correctly');
+                    done();
+                },
+                end: function() {
+                    assert.fail(asset, '', 'Should send content');
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
+        it('should return status 304 if the modified date is the same as the file\'s', function(done) {
+            var headerSet = false;
+            var statusSet = false;
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+            req.get = function(header) {
+                var mtime = fs.statSync('test/public/robots.txt').mtime;
+                if (header === 'If-Modified-Since') {
+                    return mtime.toUTCString();
+                }
+            };
+            res = {
+                set: function(headers) {
+                    var mtime = fs.statSync('test/public/robots.txt').mtime;
+                    if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
+                        headers['Content-Type'] === 'text/plain' &&
+                        headers['Content-Length'] == '13' &&
+                        headers['Cache-Control'] === 'public, max-age=31536000' &&
+                        headers['Last-Modified'] === mtime.toUTCString()) {
+
+                        headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number === 304) {
+                        statusSet = true;
+                    }
+                    else {
+                        assert.fail(number, 304, 'Wrong status');
+                    }
+                },
+                send: function(asset) {
+                    assert.fail(asset, '', 'Should not send content');
+                },
+                end: function() {
+                    assert(statusSet, 'Status was not set correctly');
+                    assert(headerSet, 'Headers were not set correctly');
+                    done();
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called end', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
+        it('should return status 304 if the modified date is later than the file\'s', function(done) {
+            var headerSet = false;
+            var statusSet = false;
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+            req.get = function(header) {
+                var mtime = fs.statSync('test/public/robots.txt').mtime;
+                mtime.setMinutes(mtime.getMinutes() + 1);
+                if (header === 'If-Modified-Since') {
+                    return mtime.toUTCString();
+                }
+            };
+            res = {
+                set: function(headers) {
+                    var mtime = fs.statSync('test/public/robots.txt').mtime;
+                    if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
+                        headers['Content-Type'] === 'text/plain' &&
+                        headers['Content-Length'] == '13' &&
+                        headers['Cache-Control'] === 'public, max-age=31536000' &&
+                        headers['Last-Modified'] === mtime.toUTCString()) {
+
+                        headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number === 304) {
+                        statusSet = true;
+                    }
+                    else {
+                        assert.fail(number, 304, 'Wrong status');
+                    }
+                },
+                send: function(asset) {
+                    assert.fail(asset, '', 'Should not send content');
+                },
+                end: function() {
+                    assert(statusSet, 'Status was not set correctly');
+                    assert(headerSet, 'Headers were not set correctly');
+                    done();
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called end', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
+        it('should send if the modified date is earlier than the file\'s', function(done) {
+            var headerSet = false;
+            var statusSet = false;
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+            req.get = function(header) {
+                var mtime = fs.statSync('test/public/robots.txt').mtime;
+                mtime.setMinutes(mtime.getMinutes() - 1);
+                if (header === 'If-Modified-Since') {
+                    return mtime.toUTCString();
+                }
+            };
+            res = {
+                set: function(headers) {
+                    var mtime = fs.statSync('test/public/robots.txt').mtime;
+                    if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
+                        headers['Content-Type'] === 'text/plain' &&
+                        headers['Content-Length'] == '13' &&
+                        headers['Cache-Control'] === 'public, max-age=31536000' &&
+                        headers['Last-Modified'] === mtime.toUTCString()) {
+
+                        headerSet = true;
+                    }
+                },
+                status: function(number) {
+                    if (number === 200) {
+                        statusSet = true;
+                    }
+                    else {
+                        assert.fail(number, 200, 'Wrong status');
+                    }
+                },
+                send: function(asset) {
+                    assert(headerSet, 'Headers were not set correctly');
+                    assert(statusSet, 'Status was not set correctly');
+                    done();
+                },
+                end: function() {
+                    assert.fail(asset, '', 'Should send content');
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
