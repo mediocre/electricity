@@ -28,7 +28,7 @@ function setupPassthrough() {
             }
         },
         send: function() {
-            assert.fail('Called send', 'called next', 'Incorrect routing', ', instead');
+            assert.fail('called send', 'called next', 'Incorrect routing', ', instead');
         }
     };
 }
@@ -42,7 +42,7 @@ describe('electricity.static', function() {
         setupPassthrough();
     });
     it('returns a function', function(done) {
-        assert.equal('function', typeof midware);
+        assert.equal(typeof midware, 'function');
         done();
     });
     it('should throw if the directory does not exist', function(done) {
@@ -79,13 +79,13 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
-                        assert.equal(0, bufCompare(data, asset));
+                        assert.equal(bufCompare(data, asset), 0);
                         done();
                     });
                 }
             };
             next = function() {
-                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -100,13 +100,13 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
-                        assert.equal(0, bufCompare(data, asset));
+                        assert.equal(bufCompare(data, asset), 0);
                         done();
                     });
                 }
             };
             next = function() {
-                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -121,13 +121,13 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/styles/normalize.css', function(err, data) {
-                        assert.equal(0, bufCompare(data, asset));
+                        assert.equal(bufCompare(data, asset));
                         done();
                     });
                 }
             };
             next = function() {
-                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -149,7 +149,7 @@ describe('electricity.static', function() {
                 }
             };
             next = function() {
-                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -164,9 +164,9 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                            headers['Content-Length'] == '13' &&
-                                headers['Cache-Control'] === 'public, max-age=31536000' &&
-                                    headers['Last-Modified'] === mtime.toUTCString()) {
+                        headers['Content-Length'] == '13' &&
+                        headers['Cache-Control'] === 'public, max-age=31536000' &&
+                        headers['Last-Modified'] === mtime.toUTCString()) {
 
                         headerSet = true;
                     }
@@ -186,7 +186,7 @@ describe('electricity.static', function() {
                 }
             };
             next = function() {
-                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -230,7 +230,7 @@ describe('electricity.static', function() {
                 }
             };
             next = function() {
-                assert.fail('Called next', 'called end', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called end', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -257,15 +257,15 @@ describe('electricity.static', function() {
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
                         zlib.gzip(data, function(err, zippedAsset) {
-                            assert.equal(0, bufCompare(zippedAsset, asset));
-                            assert(headerSet);
+                            assert.equal(bufCompare(zippedAsset, asset), 0);
+                            assert(headerSet, 'Headers not set correctly');
                             done();
                         });
                     });
                 }
             };
             next = function() {
-                assert.fail('Called next', 'called send', 'Incorrect routing', ', instead');
+                assert.fail('called send', 'called next', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -275,7 +275,7 @@ describe('electricity.static', function() {
                 locals: {}
             };
             next = function() {
-                assert.equal('function', typeof req.app.locals.electricity.url);
+                assert.equal(typeof req.app.locals.electricity.url, 'function');
                 done();
             };
             midware(req,res,next);
