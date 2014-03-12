@@ -441,17 +441,17 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
 
-        it.skip('should gzip the asset contents and send correct encoding header if the client accepts it', function(done) {
-            req.path = '/robots.txt';
+        function gzipTest(done) {
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
             req.get = function(header) {
-                if (header == 'Accept-encoding') {
+                if (header == 'Accept-Encoding') {
                     return 'gzip, deflate';
                 }
             };
             var headerSet = false;
             res = {
-                set: function(header, value){
-                    if (header == 'Content-encoding' && value == 'gzip') {
+                set: function(headers){
+                    if (headers['Content-Encoding'] === 'gzip') {
                         headerSet = true;
                     }
                 },
@@ -471,10 +471,13 @@ describe('electricity.static', function() {
                 }
             };
             next = function() {
-                assert.fail('called send', 'called next', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
-        });
+        }
+
+        it('should gzip the asset contents and send correct encoding header if the client accepts it', gzipTest);
+        it('should still send gzipped contents after gzipped content is cached', gzipTest);
 
         it('registers an EJS helper', function(done) {
             req.app = {
