@@ -205,7 +205,6 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
                         headers['Cache-Control'] === 'public, max-age=31536000' &&
                         headers['Last-Modified'] === mtime.toUTCString() &&
                         //Hard to be exact here, so just make sure it's within a day of a year
@@ -248,7 +247,6 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
                         headers['Cache-Control'] === 'public, max-age=31536000' &&
                         headers['Last-Modified'] === mtime.toUTCString()) {
 
@@ -292,7 +290,6 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
                         headers['Cache-Control'] === 'public, max-age=31536000' &&
                         headers['Last-Modified'] === mtime.toUTCString()) {
 
@@ -333,7 +330,6 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
                         headers['Cache-Control'] === 'public, max-age=31536000' &&
                         headers['Last-Modified'] === mtime.toUTCString()) {
 
@@ -375,7 +371,6 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
                         headers['Cache-Control'] === 'public, max-age=31536000' &&
                         headers['Last-Modified'] === mtime.toUTCString()) {
 
@@ -421,7 +416,6 @@ describe('electricity.static', function() {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
                     if (headers.ETag === 'ca121b5d03245bf82db00d14cee04e22' &&
                         headers['Content-Type'] === 'text/plain' &&
-                        headers['Content-Length'] == '13' &&
                         headers['Cache-Control'] === 'public, max-age=31536000' &&
                         headers['Last-Modified'] === mtime.toUTCString()) {
 
