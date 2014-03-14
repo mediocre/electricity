@@ -702,6 +702,20 @@ describe('electricity.static', function() {
                 }, 10000);
             });
         });
+
+        // Make a directory, wait a while to make sure it doesn't break anything, then remove it.
+        it('should not crash when a directory is added or removed', function (done) {
+            assert.doesNotThrow(function() {
+                fs.mkdir('test/public/watchTestDir', function(err) {
+                    if (err) throw err;
+                    setTimeout(function() {
+                        fs.rmdir('test/public/watchTestDir', function(err) {
+                            done();
+                        });
+                    }, 10000);
+                });
+            });
+        });
     });
 
     describe('The url helper', function() {
