@@ -9,7 +9,7 @@ var next;
 var midware;
 
 function setupPassthrough() {
-    //Have to set this to call done in each test for reference to work
+    // Have to set this to call done in each test for reference to work
     next = function() {
     };
     req = {
@@ -35,9 +35,11 @@ function setupPassthrough() {
 
 describe('electricity.static', function() {
     before(function() {
-        midware = electricity.static('test/public');
+        midware = electricity.static('test/public', {
+            sassImagePath: '/images/'
+        });
     });
-    //Set up default mocks before each test, override as needed
+    // Set up default mocks before each test, override as needed
     beforeEach(function() {
         setupPassthrough();
     });
@@ -75,8 +77,32 @@ describe('electricity.static', function() {
                 electricity.static('test/public', { hostname: [] });
             });
 
-            //Should succeed
-            electricity.static('test/public', { hostname: undefined });
+            // Should succeed
+            electricity.static('test/public', {
+                hostname: undefined,
+                sassImagePath: '/images/'
+            });
+        });
+
+        it('throws an error if the sassImagePath is not falsy or a string', function() {
+
+            assert.throws(function() {
+                electricity.static('test/public', { sassImagePath: {} });
+            });
+            assert.throws(function() {
+                electricity.static('test/public', { sassImagePath: 35 });
+            });
+            assert.throws(function() {
+                electricity.static('test/public', { sassImagePath: function() {} });
+            });
+            assert.throws(function() {
+                electricity.static('test/public', { sassImagePath: [] });
+            });
+
+            // Should succeed
+            electricity.static('test/public', {
+                sassImagePath: undefined
+            });
         });
     });
 
@@ -209,7 +235,7 @@ describe('electricity.static', function() {
                         headers['Content-Type'] === 'text/plain' &&
                         headers['Cache-Control'] === 'public, max-age=31536000' &&
                         headers['Last-Modified'] === mtime.toUTCString() &&
-                        //Hard to be exact here, so just make sure it's within a day of a year
+                        // Hard to be exact here, so just make sure it's within a day of a year
                         Date.parse(headers.Expires) > Date.now() + 1000 * 60 * 60 * 364) {
 
                         headerSet = true;
@@ -518,9 +544,98 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+
+        describe('SASS support', function() {
+            it('serves compiled SASS files', function(done) {
+                req.path = '/styles/sample-da39c76491d47b99ab3c1bb3aa56f653.css';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/sample.css', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midware(req, res, next);
+            });
+
+            it('correctly resolves imports', function(done) {
+                req.path = '/styles/include_path-757ae8512d2a003fe6079c7a7216f8e9.css';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/include_path.css', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midware(req, res, next);
+            });
+
+            it('uses the sassImagePath option for the image-url helper', function(done) {
+                req.path = '/styles/image_path-4b176d19bfb77386cd6ca03378b17349.css';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/image_path.css', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midware(req, res, next);
+            });
+            it('has the correct default option for the image-url helper', function(done) {
+                var defaultMiddleware = electricity.static('test/public');
+                req.path = '/styles/image_path-6e6e15fd256cf559501faad9aaaa041a.css';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/image_path_default.css', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                defaultMiddleware(req, res, next);
+            });
+        });
     });
 
-    //Monitor refuses to register until after tests are done, so we'll skip these for now
     describe('The file watcher', function() {
         it('should create a cache entry when a file is created', function(done) {
             fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function (err) {
