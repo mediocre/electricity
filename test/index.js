@@ -521,62 +521,70 @@ describe('electricity.static', function() {
     });
 
     //Monitor refuses to register until after tests are done, so we'll skip these for now
-    describe.skip('The file watcher', function() {
+    describe('The file watcher', function() {
         it('should create a cache entry when a file is created', function(done) {
             fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function (err) {
                 if(err) throw err;
-                req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
-                res = {
-                    set: function(){},
-                    status: function(number) {
-                        if (number >= 400) {
-                            assert.fail(number, '400', 'Failing status code', '<');
+                setTimeout(function () {
+                    req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
+                    res = {
+                        set: function(){},
+                        status: function(number) {
+                            if (number >= 400) {
+                                assert.fail(number, '400', 'Failing status code', '<');
+                            }
+                        },
+                        send: function(asset) {
+                            fs.readFile('test/public/watchTest.txt', function(err, data) {
+                                assert.equal(bufCompare(data, asset), 0);
+                                done();
+                            });
                         }
-                    },
-                    send: function(asset) {
-                        fs.readFile('test/public/watchTest.txt', function(err, data) {
-                            assert.equal(bufCompare(data, asset), 0);
-                            done();
-                        });
-                    }
-                };
-                next = function() {
-                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                };
-                midware(req, res, next);
+                    };
+                    next = function() {
+                        assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                    };
+                    midware(req, res, next);
+                }, 5000);
             });
         });
 
         it('should update a cache entry when a file is changed', function(done) {
             fs.appendFile('test/public/watchTest.txt', 'MORE DATA', function(err) {
-                req.path = '/watchTest-1e32064011ba3a640cfb0174a0ed9a97.txt';
-                res = {
-                    set: function(){},
-                    status: function(number) {
-                        if (number >= 400) {
-                            assert.fail(number, '400', 'Failing status code', '<');
+                if(err) throw err;
+                setTimeout(function() {
+                    req.path = '/watchTest-e4b18591cbef3ac24e02ba0e0c44e97e.txt';
+                    res = {
+                        set: function() {},
+                        status: function(number) {
+                            if (number >= 400) {
+                                assert.fail(number, '400', 'Failing status code', '<');
+                            }
+                        },
+                        send: function(asset) {
+                            fs.readFile('test/public/watchTest.txt', function(err, data) {
+                                assert.equal(bufCompare(data, asset), 0);
+                                done();
+                            });
                         }
-                    },
-                    send: function(asset) {
-                        fs.readFile('test/public/watchTest.txt', function(err, data) {
-                            assert.equal(bufCompare(data, asset), 0);
-                            done();
-                        });
-                    }
-                };
-                next = function() {
-                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                };
-                midware(req, res, next);
+                    };
+                    next = function() {
+                        assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                    };
+                    midware(req, res, next);
+                }, 5000);
             });
         });
 
         it('should remove a cache entry when a file is deleted', function(done) {
             fs.unlink('test/public/watchTest.txt', function(err) {
-                setupPassthrough();
-                next = done;
-                req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
-                midware(req, res, next);
+                if(err) throw err;
+                setTimeout(function() {
+                    setupPassthrough();
+                    next = done;
+                    req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
+                    midware(req, res, next);
+                }, 5000);
             });
         });
     });

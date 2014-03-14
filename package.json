@@ -18,8 +18,10 @@
   "repository": "git://github.com/mediocre/electricity.git",
   "scripts": {
     "app": "node test/app.js",
-    "test": "mocha --reporter spec",
-    "watch": "mocha --reporter spec -w"
+    "test": "mocha --reporter spec -t 6000",
+    "watch": "mocha --reporter spec -w -t 6000",
+    "quicktest": "mocha --reporter spec -g watcher -i",
+    "quickwatch": "mocha --reporter spec -w -g watcher -i"
   },
   "version": "0.0.7"
 }
