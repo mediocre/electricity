@@ -633,6 +633,7 @@ describe('electricity.static', function() {
                 };
                 defaultMiddleware(req, res, next);
             });
+
         });
     });
 
@@ -714,6 +715,41 @@ describe('electricity.static', function() {
                         });
                     }, 10000);
                 });
+            });
+        });
+
+        it('should recompile dependents when a watched scss file changes', function(done) {
+            fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function(err) {
+                setTimeout(function() {
+                    req.path = '/styles/include_path-9b14cc07f2e430cafc9f6661e43638db.css';
+                    res = {
+                        set: function(){},
+                        status: function(number) {
+                            if (number >= 400) {
+                                assert.fail(number, '400', 'Failing status code', '<');
+                            }
+                        },
+                        send: function(asset) {
+                            fs.readFile('test/public/styles/compiled/include_path_blue.css', function(err, data) {
+                                assert.equal(data.toString(), asset);
+                                done();
+                            });
+                        },
+                        redirect: function() {
+                            assert.fail('called redirect', 'called send', 'Incorrect routing', ', instead');
+                        }
+                    };
+                    next = function() {
+                        assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                    };
+                    midware(req, res, next);
+                }, 10000);
+            });
+        });
+
+        after(function(done) {
+            fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function(err) {
+                done();
             });
         });
     });
