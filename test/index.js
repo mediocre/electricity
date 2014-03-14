@@ -545,7 +545,7 @@ describe('electricity.static', function() {
                         assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                     };
                     midware(req, res, next);
-                }, 5000);
+                }, 10000);
             });
         });
 
@@ -572,7 +572,7 @@ describe('electricity.static', function() {
                         assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                     };
                     midware(req, res, next);
-                }, 5000);
+                }, 10000);
             });
         });
 
@@ -584,7 +584,7 @@ describe('electricity.static', function() {
                     next = done;
                     req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
                     midware(req, res, next);
-                }, 5000);
+                }, 10000);
             });
         });
     });
