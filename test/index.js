@@ -260,7 +260,7 @@ describe('electricity.static', function() {
                     statusSet = true;
                 },
                 send: function(asset) {
-                    if(asset === 304) {
+                    if (asset === 304) {
                         done();
                     } else {
                         assert.fail(asset, '', 'Should not send content');
@@ -384,7 +384,7 @@ describe('electricity.static', function() {
                     statusSet = true;
                 },
                 send: function(asset) {
-                    if(asset === 304) {
+                    if (asset === 304) {
                         done();
                     } else {
                         assert.fail(asset, '', 'Should not send content');
@@ -524,7 +524,7 @@ describe('electricity.static', function() {
     describe('The file watcher', function() {
         it('should create a cache entry when a file is created', function(done) {
             fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function (err) {
-                if(err) throw err;
+                if (err) throw err;
                 setTimeout(function () {
                     req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
                     res = {
@@ -551,7 +551,7 @@ describe('electricity.static', function() {
 
         it('should update a cache entry when a file is changed', function(done) {
             fs.appendFile('test/public/watchTest.txt', 'MORE DATA', function(err) {
-                if(err) throw err;
+                if (err) throw err;
                 setTimeout(function() {
                     req.path = '/watchTest-e4b18591cbef3ac24e02ba0e0c44e97e.txt';
                     res = {
@@ -578,7 +578,7 @@ describe('electricity.static', function() {
 
         it('should remove a cache entry when a file is deleted', function(done) {
             fs.unlink('test/public/watchTest.txt', function(err) {
-                if(err) throw err;
+                if (err) throw err;
                 setTimeout(function() {
                     setupPassthrough();
                     next = done;
