@@ -2,9 +2,9 @@
   "description": "",
   "dependencies": {
     "mime": "1.2.x",
-    "watch": "0.9.x",
     "node-sass": "0.8.x",
-    "sass-graph": "0.1.x"
+    "sass-graph": "0.1.x",
+    "watch": "0.9.x"
   },
   "devDependencies": {
     "mocha": "*",
@@ -13,6 +13,8 @@
   },
   "keywords": [
     "asset",
+    "css",
+    "sass",
     "static"
   ],
   "main": "./lib",

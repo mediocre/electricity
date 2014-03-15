@@ -10,8 +10,8 @@ var midware;
 
 function setupPassthrough() {
     // Have to set this to call done in each test for reference to work
-    next = function() {
-    };
+    next = function() {};
+
     req = {
         path: '/',
         method: 'GET',
@@ -20,6 +20,7 @@ function setupPassthrough() {
         },
         get: function() { return ''; }
     };
+
     res = {
         set: function() {},
         status: function(number) {
@@ -35,14 +36,14 @@ function setupPassthrough() {
 
 describe('electricity.static', function() {
     before(function() {
-        midware = electricity.static('test/public', {
-            sassImagePath: '/images/'
-        });
+        midware = electricity.static('test/public', { sass: { imagePath: '/images/' } });
     });
+
     // Set up default mocks before each test, override as needed
     beforeEach(function() {
         setupPassthrough();
     });
+
     it('returns a function', function(done) {
         assert.equal(typeof midware, 'function');
         done();
@@ -63,7 +64,6 @@ describe('electricity.static', function() {
 
     describe('with options', function() {
         it('throws an error if the hostname is not falsy or a string', function() {
-
             assert.throws(function() {
                 electricity.static('test/public', { hostname: {} });
             });
@@ -80,29 +80,29 @@ describe('electricity.static', function() {
             // Should succeed
             electricity.static('test/public', {
                 hostname: undefined,
-                sassImagePath: '/images/'
+                sass: { imagePath: '/images/' }
             });
         });
 
-        it('throws an error if the sassImagePath is not falsy or a string', function() {
+        it('throws an error if sass.imagePath is not falsy or a string', function() {
+            assert.throws(function() {
+                electricity.static('test/public', { sass: { imagePath: {} } });
+            });
 
             assert.throws(function() {
-                electricity.static('test/public', { sassImagePath: {} });
+                electricity.static('test/public', { sass: { imagePath: 35 } });
             });
+
             assert.throws(function() {
-                electricity.static('test/public', { sassImagePath: 35 });
+                electricity.static('test/public', { sass: { imagePath: function() {} } });
             });
+
             assert.throws(function() {
-                electricity.static('test/public', { sassImagePath: function() {} });
-            });
-            assert.throws(function() {
-                electricity.static('test/public', { sassImagePath: [] });
+                electricity.static('test/public', { sass: { imagePath: [] } });
             });
 
             // Should succeed
-            electricity.static('test/public', {
-                sassImagePath: undefined
-            });
+            electricity.static('test/public', { sass: { imagePath: undefined } });
         });
     });
 
@@ -548,6 +548,7 @@ describe('electricity.static', function() {
         describe('SASS support', function() {
             it('serves compiled SASS files', function(done) {
                 req.path = '/styles/sample-da39c76491d47b99ab3c1bb3aa56f653.css';
+
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -562,14 +563,17 @@ describe('electricity.static', function() {
                         });
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 midware(req, res, next);
             });
 
             it('correctly resolves imports', function(done) {
                 req.path = '/styles/include_path-757ae8512d2a003fe6079c7a7216f8e9.css';
+
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -584,16 +588,19 @@ describe('electricity.static', function() {
                         });
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 midware(req, res, next);
             });
 
-            it('uses the sassImagePath option for the image-url helper', function(done) {
+            it('uses the Sass imagePath option for the image-url helper', function(done) {
                 req.path = '/styles/image_path-4b176d19bfb77386cd6ca03378b17349.css';
+
                 res = {
-                    set: function(){},
+                    set: function() {},
                     status: function(number) {
                         if (number >= 400) {
                             assert.fail(number, '400', 'Failing status code', '<');
@@ -606,14 +613,18 @@ describe('electricity.static', function() {
                         });
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 midware(req, res, next);
             });
+
             it('has the correct default option for the image-url helper', function(done) {
                 var defaultMiddleware = electricity.static('test/public');
                 req.path = '/styles/image_path-6e6e15fd256cf559501faad9aaaa041a.css';
+
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -628,12 +639,13 @@ describe('electricity.static', function() {
                         });
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 defaultMiddleware(req, res, next);
             });
-
         });
     });
 
