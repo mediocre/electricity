@@ -1,1 +1,1 @@
-console.log('Dependency 1 loaded');
+console.log('dep1');

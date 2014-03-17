@@ -718,7 +718,7 @@ describe('electricity.static', function() {
 
         describe('snockets support', function() {
             it('should serve Javascript with required files included', function(done) {
-                req.path = '/scripts/main-4f5821d51ad3265d6ed673fc47cd7eb0.js';
+                req.path = '/scripts/main-c6c2afd452d98199939fb7c292c5474b.js';
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -940,14 +940,89 @@ describe('electricity.static', function() {
                 });
                 original.pipe(copy);
             });
-        });
 
-        after(function(done) {
-            fs.unlink('test/public/styles/include_path_copy.scss', function(err) {
-                if (err) throw err;
-                done();
+            after(function(done) {
+                fs.unlink('test/public/styles/include_path_copy.scss', function(err) {
+                    if (err) throw err;
+                    done();
+                });
             });
         });
+
+        describe('with snockets', function(done) {
+            it('should recompile dependents when a watched js file changes', function(done) {
+                fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1.1\');\n', function(err) {
+                    setTimeout(function() {
+                        req.path = '/scripts/main-8ebef9643de3549f70271ec51a402b26.js';
+                        res = {
+                            set: function(){},
+                            status: function(number) {
+                                if (number >= 400) {
+                                    assert.fail(number, '400', 'Failing status code', '<');
+                                }
+                            },
+                            send: function(asset) {
+                                fs.readFile('test/public/scripts/compiled/main2.js', function(err, data) {
+                                    assert.equal(data.toString(), asset.toString());
+                                    done();
+                                });
+                            },
+                            redirect: function(url) {
+                                assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                            }
+                        };
+                        next = function() {
+                            assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                        };
+                        midware(req, res, next);
+                    }, 10000);
+                });
+            });
+
+            it('should also recompile dependents for files added after load', function(done) {
+                var original = fs.createReadStream('test/public/scripts/main.js');
+                var copy = fs.createWriteStream('test/public/scripts/main2.js');
+                original.on('end', function() {
+                    setTimeout(function() {
+                        fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function(err) {
+                        setTimeout(function() {
+                            req.path = '/scripts/main2-c6c2afd452d98199939fb7c292c5474b.js';
+                            res = {
+                                set: function(){},
+                                status: function(number) {
+                                    if (number >= 400) {
+                                        assert.fail(number, '400', 'Failing status code', '<');
+                                    }
+                                },
+                                send: function(asset) {
+                                    fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
+                                        assert.equal(data.toString(), asset);
+                                        done();
+                                    });
+                                },
+                                redirect: function(url) {
+                                    assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                                }
+                            };
+                            next = function() {
+                                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                            };
+                            midware(req, res, next);
+                        }, 10000);
+                    });
+                }, 10000);
+                });
+                original.pipe(copy);
+            });
+
+            after(function(done) {
+                fs.unlink('test/public/scripts/main2.js', function(err) {
+                    if (err) throw err;
+                    done();
+                });
+            });
+        });
+
     });
 
     describe('The url helper', function() {

@@ -1,4 +1,4 @@
-console.log('dep1');
+console.log('dep1.1');
 
 console.log('Dependency 2 loaded');
 
