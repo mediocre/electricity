@@ -4,7 +4,7 @@
     "mime": "1.2.x",
     "node-sass": "0.8.x",
     "sass-graph": "0.1.x",
-    "watch": "0.9.x"
+    "watch": "git+https://github.com/Harrison-M/watch.git"
   },
   "devDependencies": {
     "mocha": "*",
@@ -22,8 +22,8 @@
   "repository": "git://github.com/mediocre/electricity.git",
   "scripts": {
     "app": "node test/app.js",
-    "test": "mocha --reporter spec -t 11000",
-    "watch": "mocha --reporter spec -w -t 11000",
+    "test": "mocha --reporter spec -t 21000",
+    "watch": "mocha --reporter spec -w -t 21000",
     "quicktest": "mocha --reporter spec -g watcher -i",
     "quickwatch": "mocha --reporter spec -w -g watcher -i"
   },

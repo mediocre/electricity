@@ -546,6 +546,13 @@ describe('electricity.static', function() {
         });
 
         describe('SASS support', function() {
+            before(function(done) {
+                fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function(err) {
+                    if (err) throw err;
+                    done();
+                });
+            });
+
             it('serves compiled SASS files', function(done) {
                 req.path = '/styles/sample-da39c76491d47b99ab3c1bb3aa56f653.css';
 
@@ -730,37 +737,76 @@ describe('electricity.static', function() {
             });
         });
 
-        it('should recompile dependents when a watched scss file changes', function(done) {
-            fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function(err) {
-                setTimeout(function() {
-                    req.path = '/styles/include_path-9b14cc07f2e430cafc9f6661e43638db.css';
-                    res = {
-                        set: function(){},
-                        status: function(number) {
-                            if (number >= 400) {
-                                assert.fail(number, '400', 'Failing status code', '<');
+        describe('with SASS', function() {
+            it('should recompile dependents when a watched scss file changes', function(done) {
+                fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function(err) {
+                    setTimeout(function() {
+                        req.path = '/styles/include_path-9b14cc07f2e430cafc9f6661e43638db.css';
+                        res = {
+                            set: function(){},
+                            status: function(number) {
+                                if (number >= 400) {
+                                    assert.fail(number, '400', 'Failing status code', '<');
+                                }
+                            },
+                            send: function(asset) {
+                                fs.readFile('test/public/styles/compiled/include_path_blue.css', function(err, data) {
+                                    assert.equal(data.toString(), asset);
+                                    done();
+                                });
+                            },
+                            redirect: function(url) {
+                                assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
                             }
-                        },
-                        send: function(asset) {
-                            fs.readFile('test/public/styles/compiled/include_path_blue.css', function(err, data) {
-                                assert.equal(data.toString(), asset);
-                                done();
-                            });
-                        },
-                        redirect: function() {
-                            assert.fail('called redirect', 'called send', 'Incorrect routing', ', instead');
-                        }
-                    };
-                    next = function() {
-                        assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                    };
-                    midware(req, res, next);
+                        };
+                        next = function() {
+                            assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                        };
+                        midware(req, res, next);
+                    }, 10000);
+                });
+            });
+
+            it('should also recompile dependents for files added after load', function(done) {
+                var original = fs.createReadStream('test/public/styles/include_path.scss');
+                var copy = fs.createWriteStream('test/public/styles/include_path_copy.scss');
+                original.on('end', function() {
+                    setTimeout(function() {
+                        fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function(err) {
+                        setTimeout(function() {
+                            req.path = '/styles/include_path_copy-757ae8512d2a003fe6079c7a7216f8e9.css';
+                            res = {
+                                set: function(){},
+                                status: function(number) {
+                                    if (number >= 400) {
+                                        assert.fail(number, '400', 'Failing status code', '<');
+                                    }
+                                },
+                                send: function(asset) {
+                                    fs.readFile('test/public/styles/compiled/include_path.css', function(err, data) {
+                                        assert.equal(data.toString(), asset);
+                                        done();
+                                    });
+                                },
+                                redirect: function(url) {
+                                    assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                                }
+                            };
+                            next = function() {
+                                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                            };
+                            midware(req, res, next);
+                        }, 20000);
+                    });
                 }, 10000);
+                });
+                original.pipe(copy);
             });
         });
 
         after(function(done) {
-            fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function(err) {
+            fs.unlink('test/public/styles/include_path_copy.scss', function(err) {
+                if (err) throw err;
                 done();
             });
         });
