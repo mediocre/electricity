@@ -796,7 +796,7 @@ describe('electricity.static', function() {
                                 assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                             };
                             midware(req, res, next);
-                        }, 20000);
+                        }, 10000);
                     });
                 }, 10000);
                 });
