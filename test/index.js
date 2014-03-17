@@ -39,7 +39,8 @@ describe('electricity.static', function() {
         midware = electricity.static('test/public', {
             sass: { imagePath: '/images/' },
             snockets: { ignore: /compiled/ },
-            uglify: { enabled: false }
+            uglify: { enabled: false },
+            uglifycss: { enabled: false }
         });
     });
 
@@ -633,7 +634,10 @@ describe('electricity.static', function() {
             });
 
             it('has the correct default option for the image-url helper', function(done) {
-                var defaultMiddleware = electricity.static('test/public', { snockets: { ignore: 'compiled' } });
+                var defaultMiddleware = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglifycss: { enabled: false }
+                });
                 req.path = '/styles/image_path-6e6e15fd256cf559501faad9aaaa041a.css';
 
                 res = {
@@ -815,6 +819,68 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/scripts/compiled/main.min.js', function(err, data) {
+                            assert.equal(data.toString(), asset.toString());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                minWare(req, res, next);
+            });
+        });
+        describe('uglifycss support', function() {
+            it('should minify CSS if enabled', function(done) {
+                var minWare = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglifycss: {
+                        enabled: true,
+                    }
+                });
+                req.path = '/styles/normalize-3975c6c53b450951dd3df2f846d0d35d.css';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/normalize.min.css', function(err, data) {
+                            assert.equal(data.toString(), asset.toString());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                minWare(req, res, next);
+            });
+            it('should minify compiled CSS if enabled', function(done) {
+                var minWare = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglifycss: {
+                        enabled: true,
+                    }
+                });
+                req.path = '/styles/include_path-e7af6c89c241034f1dcff36e1709da1f.css';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/include_path.min.css', function(err, data) {
                             assert.equal(data.toString(), asset.toString());
                             done();
                         });

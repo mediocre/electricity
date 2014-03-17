@@ -6,7 +6,8 @@
     "sass-graph": "0.1.x",
     "watch": "git+https://github.com/Harrison-M/watch.git",
     "snockets": "1.3.x",
-    "uglify-js": "2.4.x"
+    "uglify-js": "2.4.x",
+    "uglifycss": "0.0.x"
   },
   "devDependencies": {
     "mocha": "*",
