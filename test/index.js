@@ -36,7 +36,10 @@ function setupPassthrough() {
 
 describe('electricity.static', function() {
     before(function() {
-        midware = electricity.static('test/public', { sass: { imagePath: '/images/' } });
+        midware = electricity.static('test/public', {
+            sass: { imagePath: '/images/' },
+            snockets: { ignore: /compiled/ }
+        });
     });
 
     // Set up default mocks before each test, override as needed
@@ -629,7 +632,7 @@ describe('electricity.static', function() {
             });
 
             it('has the correct default option for the image-url helper', function(done) {
-                var defaultMiddleware = electricity.static('test/public');
+                var defaultMiddleware = electricity.static('test/public', { snockets: { ignore: 'compiled' } });
                 req.path = '/styles/image_path-6e6e15fd256cf559501faad9aaaa041a.css';
 
                 res = {
@@ -652,6 +655,141 @@ describe('electricity.static', function() {
                 };
 
                 defaultMiddleware(req, res, next);
+            });
+
+            it('should not compile ignored files', function(done) {
+                var ignoreWare = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    sass: { ignore: 'sample' }
+                });
+                req.path = '/styles/sample-868c5b6f0d0cbcd87ceec825c2ac6e1f.scss';
+
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/sample.scss', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                ignoreWare(req, res, next);
+            });
+
+            it('should support arrays of ignore parameters', function(done) {
+                var ignoreWare = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    sass: { ignore: ['sample'] }
+                });
+                req.path = '/styles/sample-868c5b6f0d0cbcd87ceec825c2ac6e1f.scss';
+
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/sample.scss', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                ignoreWare(req, res, next);
+            });
+        });
+
+        describe('snockets support', function() {
+            it('should serve Javascript with required files included', function(done) {
+                req.path = '/scripts/main-4f5821d51ad3265d6ed673fc47cd7eb0.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midware(req, res, next);
+            });
+            it('should not compile ignored files', function(done) {
+                var ignoreWare = electricity.static('test/public', { snockets: { ignore: /(main|compiled)/ } });
+                req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/main.js', function(err, data) {
+                            assert.equal(data.toString(), asset.toString());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                ignoreWare(req, res, next);
+            });
+            it('should support arrays of ignore parameters', function(done) {
+                var ignoreWare = electricity.static('test/public', { snockets: { ignore: ['main', 'completed'] } });
+                req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/main.js', function(err, data) {
+                            assert.equal(data.toString(), asset.toString());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                ignoreWare(req, res, next);
             });
         });
     });
@@ -839,14 +977,20 @@ describe('electricity.static', function() {
 
         describe('with the hostname option', function() {
             it('should prepend the hostname if specified', function(done) {
-                var cdnMidware = electricity.static('test/public', { hostname: 'cdn.example.com' });
+                var cdnMidware = electricity.static('test/public', {
+                    hostname: 'cdn.example.com',
+                    snockets: { ignore: /compiled/ }
+                });
                 cdnMidware(req, res, next);
                 assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
                 done();
             });
 
             it('should handle hostnames with trailing slashes', function(done) {
-                var cdnMidware = electricity.static('test/public', { hostname: 'cdn.example.com/' });
+                var cdnMidware = electricity.static('test/public', {
+                    hostname: 'cdn.example.com/',
+                    snockets: { ignore: /compiled/ }
+                });
                 cdnMidware(req, res, next);
                 assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
                 done();
