@@ -38,7 +38,8 @@ describe('electricity.static', function() {
     before(function() {
         midware = electricity.static('test/public', {
             sass: { imagePath: '/images/' },
-            snockets: { ignore: /compiled/ }
+            snockets: { ignore: /compiled/ },
+            uglify: { enabled: false }
         });
     });
 
@@ -742,7 +743,7 @@ describe('electricity.static', function() {
                 midware(req, res, next);
             });
             it('should not compile ignored files', function(done) {
-                var ignoreWare = electricity.static('test/public', { snockets: { ignore: /(main|compiled)/ } });
+                var ignoreWare = electricity.static('test/public', { snockets: { ignore: /(main|compiled)/ }, uglify: { enabled: false } });
                 req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
                 res = {
                     set: function(){},
@@ -766,8 +767,9 @@ describe('electricity.static', function() {
                 };
                 ignoreWare(req, res, next);
             });
+
             it('should support arrays of ignore parameters', function(done) {
-                var ignoreWare = electricity.static('test/public', { snockets: { ignore: ['main', 'completed'] } });
+                var ignoreWare = electricity.static('test/public', { snockets: { ignore: ['main', 'compiled'] }, uglify: { enabled: false } });
                 req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
                 res = {
                     set: function(){},
@@ -790,6 +792,41 @@ describe('electricity.static', function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
                 ignoreWare(req, res, next);
+            });
+        });
+        describe('uglify support', function() {
+            it('should minify Javascript if enabled', function(done) {
+                var minWare = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglify: {
+                        enabled: true,
+                        compress: {
+                            sequences: false
+                        }
+                    }
+                });
+                req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/compiled/main.min.js', function(err, data) {
+                            assert.equal(data.toString(), asset.toString());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                minWare(req, res, next);
             });
         });
     });
@@ -985,32 +1022,32 @@ describe('electricity.static', function() {
                 original.on('end', function() {
                     setTimeout(function() {
                         fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function(err) {
-                        setTimeout(function() {
-                            req.path = '/scripts/main2-c6c2afd452d98199939fb7c292c5474b.js';
-                            res = {
-                                set: function(){},
-                                status: function(number) {
-                                    if (number >= 400) {
-                                        assert.fail(number, '400', 'Failing status code', '<');
+                            setTimeout(function() {
+                                req.path = '/scripts/main2-c6c2afd452d98199939fb7c292c5474b.js';
+                                res = {
+                                    set: function(){},
+                                    status: function(number) {
+                                        if (number >= 400) {
+                                            assert.fail(number, '400', 'Failing status code', '<');
+                                        }
+                                    },
+                                    send: function(asset) {
+                                        fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
+                                            assert.equal(data.toString(), asset);
+                                            done();
+                                        });
+                                    },
+                                    redirect: function(url) {
+                                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
                                     }
-                                },
-                                send: function(asset) {
-                                    fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
-                                        assert.equal(data.toString(), asset);
-                                        done();
-                                    });
-                                },
-                                redirect: function(url) {
-                                    assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
-                                }
-                            };
-                            next = function() {
-                                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                            };
-                            midware(req, res, next);
-                        }, 10000);
-                    });
-                }, 10000);
+                                };
+                                next = function() {
+                                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                                };
+                                midware(req, res, next);
+                            }, 10000);
+                        });
+                    }, 10000);
                 });
                 original.pipe(copy);
             });
