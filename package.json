@@ -17,8 +17,10 @@
   "keywords": [
     "asset",
     "css",
+    "express",
     "sass",
-    "static"
+    "static",
+    "snockets"
   ],
   "main": "./lib",
   "name": "electricity",
