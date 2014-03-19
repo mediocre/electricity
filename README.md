@@ -1,7 +1,7 @@
 electricity
 ===========
 
-Static files that will make your hair stand on end
+Static file serving that will make your hair stand on end
 
 ##Usage
 
