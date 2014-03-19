@@ -7,7 +7,7 @@
     "snockets": "1.3.x",
     "uglify-js": "2.4.x",
     "uglifycss": "0.0.x",
-    "watch": "git+https://github.com/Harrison-M/watch.git",
+    "watch": "git+https://github.com/Harrison-M/watch.git"
   },
   "devDependencies": {
     "buffer-compare": "0.0.1",
