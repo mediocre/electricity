@@ -1,7 +1,7 @@
 electricity
 ===========
 
-Static assets that will make your hair stand on end
+Static files that will make your hair stand on end
 
 ##Usage
 
@@ -21,7 +21,7 @@ var options = {
     snockets: { // Object passed straight to snockets options
         ignore: ['raw', /donotcompile/] // Files to skip compilation on, can be a single argument to String.prototype.match or an array
     },
-    uglify: { // Object passed straight to uglify-js options
+    uglifyjs: { // Object passed straight to uglify-js options
         enabled: true // Minify Javascript
     },
     uglifycss: { // Object passed straight to uglifycss options
@@ -39,7 +39,7 @@ var options = {
     hostname: '',
     sass: {},
     snockets: {},
-    uglify: {
+    uglifyjs: {
         enabled: true,
         compress: {
             sequences: false
@@ -48,7 +48,7 @@ var options = {
     uglifycss: {
         enabled: true
     }
-}
+};
 ```
 
 ###In your views:

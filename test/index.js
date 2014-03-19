@@ -55,7 +55,7 @@ describe('electricity.static', function() {
         midware = electricity.static('test/public', {
             sass: { imagePath: '/images/' },
             snockets: { ignore: /compiled/ },
-            uglify: { enabled: false },
+            uglifyjs: { enabled: false },
             uglifycss: { enabled: false }
         });
     });
@@ -772,7 +772,7 @@ describe('electricity.static', function() {
             it('should not compile ignored files', function(done) {
                 var ignoreWare = electricity.static('test/public', {
                     snockets: { ignore: /(main|compiled)/ },
-                    uglify: { enabled: false },
+                    uglifyjs: { enabled: false },
                     watch: { enabled: false }
                 });
                 req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
@@ -802,7 +802,7 @@ describe('electricity.static', function() {
             it('should support arrays of ignore parameters', function(done) {
                 var ignoreWare = electricity.static('test/public', {
                     snockets: { ignore: ['main', 'compiled'] },
-                    uglify: { enabled: false },
+                    uglifyjs: { enabled: false },
                     watch: { enabled: false }
                 });
                 req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
@@ -829,11 +829,11 @@ describe('electricity.static', function() {
                 ignoreWare(req, res, next);
             });
         });
-        describe('uglify support', function() {
+        describe('uglifyjs support', function() {
             it('should minify Javascript if enabled', function(done) {
                 var minWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
-                    uglify: {
+                    uglifyjs: {
                         enabled: true,
                         compress: {
                             sequences: false
