@@ -85,7 +85,8 @@ describe('electricity.static', function() {
             // Should succeed
             electricity.static('test/public', {
                 hostname: undefined,
-                sass: { imagePath: '/images/' }
+                sass: { imagePath: '/images/' },
+                watch: { enabled: false }
             });
         });
 
@@ -107,7 +108,10 @@ describe('electricity.static', function() {
             });
 
             // Should succeed
-            electricity.static('test/public', { sass: { imagePath: undefined } });
+            electricity.static('test/public', {
+                sass: { imagePath: undefined },
+                watch: { enabled: false }
+            });
         });
     });
 
@@ -636,7 +640,8 @@ describe('electricity.static', function() {
             it('has the correct default option for the image-url helper', function(done) {
                 var defaultMiddleware = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
-                    uglifycss: { enabled: false }
+                    uglifycss: { enabled: false },
+                    watch: { enabled: false }
                 });
                 req.path = '/styles/image_path-6e6e15fd256cf559501faad9aaaa041a.css';
 
@@ -665,7 +670,8 @@ describe('electricity.static', function() {
             it('should not compile ignored files', function(done) {
                 var ignoreWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
-                    sass: { ignore: 'sample' }
+                    sass: { ignore: 'sample' },
+                    watch: { enabled: false }
                 });
                 req.path = '/styles/sample-868c5b6f0d0cbcd87ceec825c2ac6e1f.scss';
 
@@ -694,7 +700,8 @@ describe('electricity.static', function() {
             it('should support arrays of ignore parameters', function(done) {
                 var ignoreWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
-                    sass: { ignore: ['sample'] }
+                    sass: { ignore: ['sample'] },
+                    watch: { enabled: false }
                 });
                 req.path = '/styles/sample-868c5b6f0d0cbcd87ceec825c2ac6e1f.scss';
 
@@ -747,7 +754,11 @@ describe('electricity.static', function() {
                 midware(req, res, next);
             });
             it('should not compile ignored files', function(done) {
-                var ignoreWare = electricity.static('test/public', { snockets: { ignore: /(main|compiled)/ }, uglify: { enabled: false } });
+                var ignoreWare = electricity.static('test/public', {
+                    snockets: { ignore: /(main|compiled)/ },
+                    uglify: { enabled: false },
+                    watch: { enabled: false }
+                });
                 req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
                 res = {
                     set: function(){},
@@ -773,7 +784,11 @@ describe('electricity.static', function() {
             });
 
             it('should support arrays of ignore parameters', function(done) {
-                var ignoreWare = electricity.static('test/public', { snockets: { ignore: ['main', 'compiled'] }, uglify: { enabled: false } });
+                var ignoreWare = electricity.static('test/public', {
+                    snockets: { ignore: ['main', 'compiled'] },
+                    uglify: { enabled: false },
+                    watch: { enabled: false }
+                });
                 req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
                 res = {
                     set: function(){},
@@ -807,7 +822,8 @@ describe('electricity.static', function() {
                         compress: {
                             sequences: false
                         }
-                    }
+                    },
+                    watch: { enabled: false }
                 });
                 req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
                 res = {
@@ -839,7 +855,8 @@ describe('electricity.static', function() {
                     snockets: { ignore: 'compiled' },
                     uglifycss: {
                         enabled: true,
-                    }
+                    },
+                    watch: { enabled: false }
                 });
                 req.path = '/styles/normalize-3975c6c53b450951dd3df2f846d0d35d.css';
                 res = {
@@ -869,7 +886,8 @@ describe('electricity.static', function() {
                     snockets: { ignore: 'compiled' },
                     uglifycss: {
                         enabled: true,
-                    }
+                    },
+                    watch: { enabled: false }
                 });
                 req.path = '/styles/include_path-e7af6c89c241034f1dcff36e1709da1f.css';
                 res = {
@@ -1157,7 +1175,8 @@ describe('electricity.static', function() {
             it('should prepend the hostname if specified', function(done) {
                 var cdnMidware = electricity.static('test/public', {
                     hostname: 'cdn.example.com',
-                    snockets: { ignore: /compiled/ }
+                    snockets: { ignore: /compiled/ },
+                    watch: { enabled: false }
                 });
                 cdnMidware(req, res, next);
                 assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
@@ -1167,7 +1186,8 @@ describe('electricity.static', function() {
             it('should handle hostnames with trailing slashes', function(done) {
                 var cdnMidware = electricity.static('test/public', {
                     hostname: 'cdn.example.com/',
-                    snockets: { ignore: /compiled/ }
+                    snockets: { ignore: /compiled/ },
+                    watch: { enabled: false }
                 });
                 cdnMidware(req, res, next);
                 assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
