@@ -4,6 +4,9 @@ Electricity
 An alternative to the built-in Express middleware for serving static files.
 Electricity follows a number of best practices for making web pages fast.
 
+The built-in Express middleware for serving static files is great if you need basic support for serving static files.
+But if you want to follow [Best Practices for Speeding Up Your Web Site](http://developer.yahoo.com/performance/rules.html) you need something that can concat, gzip, and minify your static files. Electricity does all this and more without the need to create a complicated build process using Grunt or a similar build tool.
+
 ##Basic Usage
 
 Typically, in an Express app you'd serve static files using the built-in middleware. Like this:
