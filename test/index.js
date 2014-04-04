@@ -232,6 +232,29 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
 
+        it('correctly redirects for a file whose filename contains something looking like a hash', function(done) {
+            var redirected = false;
+            req.path = '/robots-3e.txt';
+            res = {
+                redirect: function(url) {
+                    if (url === '/robots-3e-ca121b5d03245bf82db00d14cee04e22.txt') {
+                        redirected = true;
+                    }
+                    done();
+                },
+                send: function(asset) {
+                    assert.fail(asset, '', 'Should not send');
+                },
+                end: function() {
+                    assert(redirected, 'Redirect was not set correctly');
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midware(req,res,next);
+        });
+
         it('should only send a status code and correct headers on HEAD request', function(done) {
             var headerSet = false;
             var statusSet = false;
