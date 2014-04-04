@@ -199,7 +199,7 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/styles/normalize.css', function(err, data) {
-                        assert.equal(bufCompare(data, asset), 0);
+                        assert.equal(bufCompare(data.toString(), asset), 0);
                         done();
                     });
                 }
@@ -663,12 +663,15 @@ describe('electricity.static', function() {
             it('has the correct default option for the image-url helper', function(done) {
                 var defaultMiddleware = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
-                    uglifycss: { enabled: false },
+                    uglifycss: { enabled: true },
                     watch: { enabled: false }
                 });
-                req.path = '/styles/image_path-6e6e15fd256cf559501faad9aaaa041a.css';
+                req.path = '/styles/image_path-40e2058ca7f46a8942cf943787877376.css';
 
                 res = {
+                    redirect: function(url) {
+                        assert.fail(url, 'should not redirect', '', '');
+                    },
                     set: function(){},
                     status: function(number) {
                         if (number >= 400) {
