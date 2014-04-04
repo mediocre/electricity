@@ -666,7 +666,7 @@ describe('electricity.static', function() {
                     uglifycss: { enabled: true },
                     watch: { enabled: false }
                 });
-                req.path = '/styles/image_path-40e2058ca7f46a8942cf943787877376.css';
+                req.path = '/styles/image_path-90b3721cd8de55e7d87f2e63448cf44b.css';
 
                 res = {
                     redirect: function(url) {
