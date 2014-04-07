@@ -107,6 +107,20 @@ Pass options to the middleware like this:
 app.use(electricity.static(__dirname + '/public', options));
 ```
 
+##CSS asset URL's
+
+Electricity will automatically rewrite paths in CSS to use absolute paths, hashes, and, if specified, a CDN hostname.  For example, using the default options below, this in the public/styles directory:
+
+```css
+background-image: url('../apple-touch-icon-precomposed.png');
+```
+
+becomes this to allow caching and avoid unnecessary redirects:
+
+```css
+background-image: url('/apple-touch-icon-precomposed-d131dd02c5e6eec4.png');
+```
+
 ##CDN Hostname
 
 If you specify a hostname like this:
