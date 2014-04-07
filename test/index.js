@@ -668,7 +668,7 @@ describe('electricity.static', function() {
                     uglifycss: { enabled: true },
                     watch: { enabled: false }
                 });
-                req.path = '/styles/image_path-40e2058ca7f46a8942cf943787877376.css';
+                req.path = '/styles/image_path-58c7e927b74b217b2796c4cafc3e8d27.css';
 
                 res = {
                     redirect: function(url) {
@@ -701,7 +701,7 @@ describe('electricity.static', function() {
                     uglifycss: { enabled: true },
                     watch: { enabled: false }
                 });
-                req.path = '/styles/image_path-feb057429966d6408f58fd20b5b111db.css';
+                req.path = '/styles/image_path-0a8f38134092864f21d2cc9c558d54ab.css';
 
                 res = {
                     redirect: function(url) {
@@ -733,7 +733,7 @@ describe('electricity.static', function() {
                     uglifycss: { enabled: true },
                     watch: { enabled: false }
                 });
-                req.path = '/styles/relative_image_path-40e2058ca7f46a8942cf943787877376.css';
+                req.path = '/styles/image_path-58c7e927b74b217b2796c4cafc3e8d27.css';
 
                 res = {
                     redirect: function(url) {
