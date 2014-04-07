@@ -18,7 +18,8 @@ function setupPassthrough() {
         app: {
             locals: {}
         },
-        get: function() { return ''; }
+        get: function() { return ''; },
+        headers: {}
     };
 
     res = {
@@ -508,6 +509,7 @@ describe('electricity.static', function() {
                     return 'gzip, deflate';
                 }
             };
+            req.headers['accept-encoding'] = 'gzip, deflate';
             var headerSet = false;
             res = {
                 set: function(headers){
