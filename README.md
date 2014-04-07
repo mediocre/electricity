@@ -26,6 +26,8 @@ var electricity = require('electricity');
 app.use(electricity.static(__dirname + '/public'));
 ```
 
+##View Helper
+
 A common best practice for serving static files is to set a far future `Expires` header: http://developer.yahoo.com/performance/rules.html#expires
 
 When you set a far future `Expires` header you have to change the file name whenever the contents of the file change.
