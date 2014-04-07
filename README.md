@@ -36,9 +36,9 @@ You have access to this file name using a view helper method that builds URLs fo
 If you're using EJS it looks something like this:
 
 ```ejs
-<img src="<%= electricity.url('apple-touch-icon-precomposed.png') %>" />
-<link href="<%= electricity.url('styles/style.css') %>" rel="stylesheet" />
-<script src="<%= electricity.url('scripts/script.js') %>"></script>
+<img src="<%= electricity.url('/apple-touch-icon-precomposed.png') %>" />
+<link href="<%= electricity.url('/styles/style.css') %>" rel="stylesheet" />
+<script src="<%= electricity.url('/scripts/script.js') %>"></script>
 ```
 
 Which ultimately gets rendered as something like this:
@@ -125,9 +125,9 @@ app.use(electricity.static(__dirname + '/public'), options);
 
 Then render URLs using the view helper like this:
 ```ejs
-<img src="<%= electricity.url('apple-touch-icon-precomposed.png') %>" />
-<link href="<%= electricity.url('styles/style.css') %>" rel="stylesheet" />
-<script src="<%= electricity.url('scripts/script.js') %>"></script>
+<img src="<%= electricity.url('/apple-touch-icon-precomposed.png') %>" />
+<link href="<%= electricity.url('/styles/style.css') %>" rel="stylesheet" />
+<script src="<%= electricity.url('/scripts/script.js') %>"></script>
 ```
 
 Your HTML will ultimately get rendered using protocol-relative URLs like this:
