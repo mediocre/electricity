@@ -200,7 +200,7 @@ describe('electricity.static', function() {
                 },
                 send: function(asset) {
                     fs.readFile('test/public/styles/normalize.css', function(err, data) {
-                        assert.equal(bufCompare(data, asset), 0);
+                        assert.equal(bufCompare(data.toString(), asset), 0);
                         done();
                     });
                 }
@@ -665,12 +665,80 @@ describe('electricity.static', function() {
             it('has the correct default option for the image-url helper', function(done) {
                 var defaultMiddleware = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
-                    uglifycss: { enabled: false },
+                    uglifycss: { enabled: true },
                     watch: { enabled: false }
                 });
-                req.path = '/styles/image_path-6e6e15fd256cf559501faad9aaaa041a.css';
+                req.path = '/styles/image_path-40e2058ca7f46a8942cf943787877376.css';
 
                 res = {
+                    redirect: function(url) {
+                        assert.fail(url, 'should not redirect', '', '');
+                    },
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/image_path_default.css', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                defaultMiddleware(req, res, next);
+            });
+            it('uses a given hostname for css url assets', function(done) {
+                var defaultMiddleware = electricity.static('test/public', {
+                    hostname: 'example.com',
+                    snockets: { ignore: 'compiled' },
+                    uglifycss: { enabled: true },
+                    watch: { enabled: false }
+                });
+                req.path = '/styles/image_path-feb057429966d6408f58fd20b5b111db.css';
+
+                res = {
+                    redirect: function(url) {
+                        assert.fail(url, 'should not redirect', '', '');
+                    },
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/image_path_hostname.css', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                defaultMiddleware(req, res, next);
+            });
+            it('should work with relative css url\'s', function(done) {
+                var defaultMiddleware = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglifycss: { enabled: true },
+                    watch: { enabled: false }
+                });
+                req.path = '/styles/relative_image_path-40e2058ca7f46a8942cf943787877376.css';
+
+                res = {
+                    redirect: function(url) {
+                        assert.fail(url, 'should not redirect', '', '');
+                    },
                     set: function(){},
                     status: function(number) {
                         if (number >= 400) {
