@@ -692,7 +692,7 @@ describe('electricity.static', function() {
 
                 defaultMiddleware(req, res, next);
             });
-            it('uses a given hostname for image assets', function(done) {
+            it('uses a given hostname for css url assets', function(done) {
                 var defaultMiddleware = electricity.static('test/public', {
                     hostname: 'example.com',
                     snockets: { ignore: 'compiled' },
@@ -713,6 +713,38 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/styles/compiled/image_path_hostname.css', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                defaultMiddleware(req, res, next);
+            });
+            it('should work with relative css url\'s', function(done) {
+                var defaultMiddleware = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglifycss: { enabled: true },
+                    watch: { enabled: false }
+                });
+                req.path = '/styles/relative_image_path-40e2058ca7f46a8942cf943787877376.css';
+
+                res = {
+                    redirect: function(url) {
+                        assert.fail(url, 'should not redirect', '', '');
+                    },
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/styles/compiled/image_path_default.css', function(err, data) {
                             assert.equal(data.toString(), asset);
                             done();
                         });
