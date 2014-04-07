@@ -45,7 +45,7 @@ Which ultimately gets rendered as something like this:
 
 ```html
 <img src="/apple-touch-icon-precomposed-d131dd02c5e6eec4.png" />
-<link href="/styles/style-693d9a0698aff95c.css')" rel="stylesheet" />
+<link href="/styles/style-693d9a0698aff95c.css" rel="stylesheet" />
 <script src="/scripts/script-2fcab58712467eab.js"></script>
 ```
 
@@ -133,7 +133,7 @@ Then render URLs using the view helper like this:
 Your HTML will ultimately get rendered using protocol-relative URLs like this:
 ```html
 <img src="//cdn.example.com/apple-touch-icon-precomposed-d131dd02c5e6eec4.png" />
-<link href="//cdn.example.com/styles/style-693d9a0698aff95c.css')" rel="stylesheet" />
+<link href="//cdn.example.com/styles/style-693d9a0698aff95c.css" rel="stylesheet" />
 <script src="//cdn.example.com/scripts/script-2fcab58712467eab.js"></script>
 ```
 
