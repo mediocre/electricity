@@ -1,5 +1,5 @@
 {
-  "description": "",
+  "description": "An alternative to the built-in Express middleware for serving static files. Electricity follows a number of best practices for making web pages fast.",
   "dependencies": {
     "mime": "1.2.x",
     "node-sass": "0.8.x",
@@ -31,5 +31,5 @@
     "test": "mocha --reporter spec -t 21000",
     "watch": "mocha --reporter spec -w -g watcher -i"
   },
-  "version": "0.1.1"
+  "version": "1.0.0"
 }
