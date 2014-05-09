@@ -1264,6 +1264,14 @@ describe('electricity.static', function() {
             done();
         });
 
+        it('should preserve query and targets', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('/robots.txt?abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc');
+            assert.equal(req.app.locals.electricity.url('/robots.txt#abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt#abc');
+            assert.equal(req.app.locals.electricity.url('/robots.txt?abc#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc#def');
+            done();
+        });
+
         describe('with the hostname option', function() {
             it('should prepend the hostname if specified', function(done) {
                 var cdnMidware = electricity.static('test/public', {
