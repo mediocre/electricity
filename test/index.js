@@ -985,7 +985,7 @@ describe('electricity.static', function() {
                     },
                     watch: { enabled: false }
                 });
-                req.path = '/styles/normalize-3975c6c53b450951dd3df2f846d0d35d.css';
+                req.path = '/styles/normalize-62925d221200eee3d77a6bb85cb7cf66.css';
                 res = {
                     set: function(){},
                     status: function(number) {
