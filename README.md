@@ -67,6 +67,7 @@ Default options look like this:
 
 ```javascript
 var options = {
+    headers: {},
     hostname: '',
     sass: {},
     snockets: {},
@@ -86,6 +87,7 @@ You can override the default options to look something like this:
 
 ```javascript
 var options = {
+    headers: { 'Access-Control-Allow-Origin': 'http://foo.example' },
     hostname: 'cdn.example.com', // CDN hostname
     sass: { // Object passed straight to node-sass options
         imagePath: '/images', // Image path for sass image-url helper
