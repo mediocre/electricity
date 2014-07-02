@@ -111,6 +111,16 @@ Pass options to the middleware like this:
 app.use(electricity.static(__dirname + '/public', options));
 ```
 
+##HTTP Headers
+
+Electricity sets proper `Cache-Control`, `ETag`, `Expires`, and `Last-Modified` headers to help avoid unnecessary HTTP requests on subsequent page views. If you'd like to specify literal values for specific HTTP headers you can specify them in the `headers` option. This is useful if you need to specify a `Access-Control-Allow-Origin` header when loading fonts or JSON data off a CDN.
+
+```
+app.use(electricity.static(__dirname + '/public', {
+    headers: { 'Access-Control-Allow-Origin': '*' }
+}));
+```
+
 ##CSS URI Values
 
 Electricity will automatically rewrite URIs in CSS to use MD5 hashes (if a matching file is found). For example:
