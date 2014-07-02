@@ -168,6 +168,40 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+        it('calls res.send with custom headers if specified', function(done) {
+            var midwareWithHeaders = electricity.static('test/public', {
+                headers: { 'X-Custom': 'test' },
+                sass: { imagePath: '/images/' },
+                snockets: { ignore: /compiled/ },
+                uglifyjs: { enabled: false },
+                uglifycss: { enabled: false }
+            });
+            var setCustomHeader = false;
+            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+            res = {
+                set: function(headers){
+                    if (headers['X-Custom'] === 'test') {
+                        setCustomHeader = true;
+                    }
+                },
+                status: function(number) {
+                    if (number >= 400) {
+                        assert.fail(number, '400', 'Failing status code', '<');
+                    }
+                },
+                send: function(asset) {
+                    assert(setCustomHeader, 'Did not set custom header');
+                    fs.readFile('test/public/robots.txt', function(err, data) {
+                        assert.equal(bufCompare(data, asset), 0);
+                        done();
+                    });
+                }
+            };
+            next = function() {
+                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+            };
+            midwareWithHeaders(req,res,next);
+        });
         it('should only remove the hash from the path', function(done) {
             req.path = '/robots-abc1de.home-ca121b5d03245bf82db00d14cee04e22.txt';
             res = {
