@@ -126,6 +126,7 @@ describe('electricity.static', function() {
             };
             midware(req, res, next);
         });
+
         it.skip('calls res.send with asset contents if the asset does exist', function(done) {
             req.path = '/robots.txt';
             res = {
@@ -147,6 +148,7 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+
         it('calls res.send with asset contents if the asset does exist and has its hash appended', function(done) {
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
             res = {
@@ -168,6 +170,7 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+
         it('calls res.send with custom headers if specified', function(done) {
             var midwareWithHeaders = electricity.static('test/public', {
                 headers: { 'X-Custom': 'test' },
@@ -202,6 +205,7 @@ describe('electricity.static', function() {
             };
             midwareWithHeaders(req,res,next);
         });
+
         it('should only remove the hash from the path', function(done) {
             req.path = '/robots-abc1de.home-ca121b5d03245bf82db00d14cee04e22.txt';
             res = {
@@ -223,6 +227,7 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
+
         it('correctly serves files from subdirectories', function(done) {
             req.path = '/styles/normalize-dc691d63a0d03f7c0dba9f0eda398b5b.css';
             res = {
@@ -244,7 +249,8 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
-        it('sends a 302 redirect if the hash does not match the current file', function(done) {
+        
+        it.only('sends a 302 redirect if the hash does not match the current file', function(done) {
             var redirected = false;
             req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
             res = {
