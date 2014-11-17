@@ -250,10 +250,13 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
         
-        it.only('sends a 302 redirect if the hash does not match the current file', function(done) {
+        it('sends a 302 redirect if the hash does not match the current file', function(done) {
             var redirected = false;
             req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
             res = {
+                end: function() {
+                    assert(redirected, 'Redirect was not set correctly');
+                },
                 redirect: function(url) {
                     if (url === '/robots-ca121b5d03245bf82db00d14cee04e22.txt') {
                         redirected = true;
@@ -263,9 +266,7 @@ describe('electricity.static', function() {
                 send: function(asset) {
                     assert.fail(asset, '', 'Should not send');
                 },
-                end: function() {
-                    assert(redirected, 'Redirect was not set correctly');
-                }
+                set: function(){}
             };
             next = function() {
                 assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
@@ -277,6 +278,9 @@ describe('electricity.static', function() {
             var redirected = false;
             req.path = '/robots-3e.txt';
             res = {
+                end: function() {
+                    assert(redirected, 'Redirect was not set correctly');
+                },
                 redirect: function(url) {
                     if (url === '/robots-3e-ca121b5d03245bf82db00d14cee04e22.txt') {
                         redirected = true;
@@ -286,9 +290,7 @@ describe('electricity.static', function() {
                 send: function(asset) {
                     assert.fail(asset, '', 'Should not send');
                 },
-                end: function() {
-                    assert(redirected, 'Redirect was not set correctly');
-                }
+                set: function(){}
             };
             next = function() {
                 assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
