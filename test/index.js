@@ -54,18 +54,21 @@ describe('electricity.static', function() {
         assert.equal(typeof midware, 'function');
         done();
     });
+
     it('should throw if the directory does not exist', function(done) {
         assert.throws(function() {
             electricity.static('test/nope');
         });
         done();
     });
+
     it('should throw if the directory is a file', function(done) {
         assert.throws(function() {
             electricity.static('package.json');
         });
         done();
     });
+
     it('should throw if permissions are insufficent');
 
     describe('with options', function() {
@@ -581,6 +584,7 @@ describe('electricity.static', function() {
         }
 
         it('should gzip the asset contents and send correct encoding header if the client accepts it', gzipTest);
+
         it('should still send gzipped contents after gzipped content is cached', gzipTest);
 
         it('should not gzip non-whitelisted MIME types', function(done) {
@@ -736,6 +740,7 @@ describe('electricity.static', function() {
 
                 defaultMiddleware(req, res, next);
             });
+
             it('uses a given hostname for css url assets', function(done) {
                 var defaultMiddleware = electricity.static('test/public', {
                     hostname: 'example.com',
@@ -769,6 +774,7 @@ describe('electricity.static', function() {
 
                 defaultMiddleware(req, res, next);
             });
+
             it('should work with relative css url\'s', function(done) {
                 var defaultMiddleware = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
@@ -888,6 +894,7 @@ describe('electricity.static', function() {
                 };
                 midware(req, res, next);
             });
+
             it('should not compile ignored files', function(done) {
                 var ignoreWare = electricity.static('test/public', {
                     snockets: { ignore: /(main|compiled)/ },
@@ -948,6 +955,7 @@ describe('electricity.static', function() {
                 ignoreWare(req, res, next);
             });
         });
+
         describe('uglifyjs support', function() {
             it('should minify Javascript if enabled', function(done) {
                 var minWare = electricity.static('test/public', {
@@ -984,6 +992,7 @@ describe('electricity.static', function() {
                 minWare(req, res, next);
             });
         });
+
         describe('uglifycss support', function() {
             it('should minify CSS if enabled', function(done) {
                 var minWare = electricity.static('test/public', {
@@ -1016,6 +1025,7 @@ describe('electricity.static', function() {
                 };
                 minWare(req, res, next);
             });
+
             it('should minify compiled CSS if enabled', function(done) {
                 var minWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
