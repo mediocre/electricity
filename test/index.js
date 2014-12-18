@@ -76,12 +76,15 @@ describe('electricity.static', function() {
             assert.throws(function() {
                 electricity.static('test/public', { hostname: {} });
             });
+
             assert.throws(function() {
                 electricity.static('test/public', { hostname: 35 });
             });
+
             assert.throws(function() {
                 electricity.static('test/public', { hostname: function() {} });
             });
+
             assert.throws(function() {
                 electricity.static('test/public', { hostname: [] });
             });
@@ -90,6 +93,7 @@ describe('electricity.static', function() {
             electricity.static('test/public', {
                 hostname: undefined,
                 sass: { imagePath: '/images/' },
+                snockets: { ignore: /compiled/ },
                 watch: { enabled: false }
             });
         });
@@ -114,6 +118,7 @@ describe('electricity.static', function() {
             // Should succeed
             electricity.static('test/public', {
                 sass: { imagePath: undefined },
+                snockets: { ignore: /compiled/ },
                 watch: { enabled: false }
             });
         });
