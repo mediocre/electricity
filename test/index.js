@@ -288,6 +288,7 @@ describe('electricity.static', function() {
                     if (url === '/robots-3e-ca121b5d03245bf82db00d14cee04e22.txt') {
                         redirected = true;
                     }
+                    assert(redirected, 'Did not redirect whose filename contains something looking like a hash');
                     done();
                 },
                 send: function(asset) {
