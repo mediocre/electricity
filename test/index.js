@@ -94,6 +94,7 @@ describe('electricity.static', function() {
                 hostname: undefined,
                 sass: { imagePath: '/images/' },
                 snockets: { ignore: /compiled/ },
+                uglifyjs: { ignore: /failure/ },
                 watch: { enabled: false }
             });
         });
@@ -119,6 +120,7 @@ describe('electricity.static', function() {
             electricity.static('test/public', {
                 sass: { imagePath: undefined },
                 snockets: { ignore: /compiled/ },
+                uglifyjs: { ignore: /failure/ },
                 watch: { enabled: false }
             });
         });
@@ -718,6 +720,7 @@ describe('electricity.static', function() {
                 var defaultMiddleware = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
                     uglifycss: { enabled: true },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 req.path = '/styles/image_path-58c7e927b74b217b2796c4cafc3e8d27.css';
@@ -752,6 +755,7 @@ describe('electricity.static', function() {
                     hostname: 'example.com',
                     snockets: { ignore: 'compiled' },
                     uglifycss: { enabled: true },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 req.path = '/styles/image_path-0a8f38134092864f21d2cc9c558d54ab.css';
@@ -785,6 +789,7 @@ describe('electricity.static', function() {
                 var defaultMiddleware = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
                     uglifycss: { enabled: true },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 req.path = '/styles/image_path-58c7e927b74b217b2796c4cafc3e8d27.css';
@@ -818,6 +823,7 @@ describe('electricity.static', function() {
                 var ignoreWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
                     sass: { ignore: 'sample' },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 req.path = '/styles/sample-868c5b6f0d0cbcd87ceec825c2ac6e1f.scss';
@@ -848,6 +854,7 @@ describe('electricity.static', function() {
                 var ignoreWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
                     sass: { ignore: ['sample'] },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 req.path = '/styles/sample-868c5b6f0d0cbcd87ceec825c2ac6e1f.scss';
@@ -968,6 +975,41 @@ describe('electricity.static', function() {
                     snockets: { ignore: 'compiled' },
                     uglifyjs: {
                         enabled: true,
+                        ignore: /failure/,
+                        compress: {
+                            sequences: false
+                        }
+                    },
+                    watch: { enabled: false }
+                });
+                req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/compiled/main.min.js', function(err, data) {
+                            assert.equal(data.toString(), asset.toString());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                minWare(req, res, next);
+            });
+            it('should should not crash if minification fails', function(done) {
+                var minWare = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglifyjs: {
+                        enabled: true,
                         compress: {
                             sequences: false
                         }
@@ -1006,6 +1048,7 @@ describe('electricity.static', function() {
                     uglifycss: {
                         enabled: true,
                     },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 req.path = '/styles/normalize-62925d221200eee3d77a6bb85cb7cf66.css';
@@ -1038,6 +1081,7 @@ describe('electricity.static', function() {
                     uglifycss: {
                         enabled: true,
                     },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 req.path = '/styles/include_path-e7af6c89c241034f1dcff36e1709da1f.css';
@@ -1335,6 +1379,7 @@ describe('electricity.static', function() {
                 var cdnMidware = electricity.static('test/public', {
                     hostname: 'cdn.example.com',
                     snockets: { ignore: /compiled/ },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 cdnMidware(req, res, next);
@@ -1346,6 +1391,7 @@ describe('electricity.static', function() {
                 var cdnMidware = electricity.static('test/public', {
                     hostname: 'cdn.example.com/',
                     snockets: { ignore: /compiled/ },
+                    uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
                 cdnMidware(req, res, next);
