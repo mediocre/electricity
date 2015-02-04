@@ -58,6 +58,7 @@ Electricity comes with a variety of features to help make your web pages fast wi
 - **Gzip:** Electricity gzips many content types (CSS, HTML, JavaScript, JSON, plaintext, XML) to reduce response sizes.
 - **Snockets:** Electricity supports Snockets (A JavaScript concatenation tool for Node.js inspired by Sprockets). You can use Snockets to combine multiple JavaScript files into a single JavaScript file which helps minimize HTTP requests.
 - **Sass:** Electricity supports Sass (Sassy CSS). Among other features, Sass can be used to combine multiple CSS files into a single CSS file which helps minimize HTTP requests. NOTE: We currently only support .scss files (not .sass files written in the older syntax).
+- **JSX:** Electricty transforms [React JSX](http://facebook.github.io/react/docs/jsx-in-depth.html) for you automatically using the official [react-tools](https://www.npmjs.com/package/react-tools) package. No need for client-side translation or build steps.
 - **CDN Hostname:** If you're using a CDN (Content Delivery Network) that supports a custom origin (like Amazon CloudFront) you can specify the hostname you'd like Electricity to use when generating URLs.
 - **Watch:** Electricity watches for changes to your static files and automatically serves the latest content without the need to restart your web server (useful during development). Electricity also understands Sass and Snockets dependency graphs to ensure the parent file contents are updated if a child file has been modified.
 
@@ -89,6 +90,9 @@ You can override the default options to look something like this:
 var options = {
     headers: { 'Access-Control-Allow-Origin': 'http://foo.example' },
     hostname: 'cdn.example.com', // CDN hostname
+    jsx: { // Object passed straight to react-tools options
+        ignore: ['raw', /donotcompile/] // Files to skip compilation on, can be a single argument to String.prototype.match or an array
+    }
     sass: { // Object passed straight to node-sass options
         imagePath: '/images', // Image path for sass image-url helper
         ignore: ['raw', /donotcompile/] // Files to skip compilation on, can be a single argument to String.prototype.match or an array
