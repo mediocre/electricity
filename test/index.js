@@ -969,6 +969,100 @@ describe('electricity.static', function() {
             });
         });
 
+        describe('react support', function() {
+            it('should compile jsx files', function(done) {
+                var jsxMiddleware = electricity.static('test/public', {
+                    jsx: { ignore: 'compiled' },
+                    snockets: { enabled: false },
+                    uglifyjs: { enabled: false },
+                    watch: { enabled: false }
+                });
+                req.path = '/jsx/reactTest-185406c31a8edd01ff39d5ba7506513f.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/jsx/compiled/reactTest.js', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                jsxMiddleware(req, res, next);
+            });
+
+            it('should compile jsx files with snockets includes', function(done) {
+                var jsxMiddleware = electricity.static('test/public', {
+                    jsx: { ignore: 'compiled' },
+                    snockets: { enabled: true },
+                    uglifyjs: { enabled: false },
+                    watch: { enabled: false }
+                });
+                req.path = '/jsx/reactSnockets-a0df1fd0ccebc9227d2afe96bfd71645.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/jsx/compiled/reactSnockets.js', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                jsxMiddleware(req, res, next);
+            });
+            it('should compile jsx files and uglify them', function(done) {
+                var jsxMiddleware = electricity.static('test/public', {
+                    jsx: { ignore: 'compiled' },
+                    snockets: { enabled: true },
+                    uglifyjs: { enabled: true },
+                    watch: { enabled: false }
+                });
+                req.path = '/jsx/reactSnockets-672b7d0ee298f0668d4ca6372262bc43.js';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/jsx/compiled/reactSnockets.min.js', function(err, data) {
+                            assert.equal(data.toString(), asset);
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                jsxMiddleware(req, res, next);
+            });
+        });
+
         describe('uglifyjs support', function() {
             it('should minify Javascript if enabled', function(done) {
                 var minWare = electricity.static('test/public', {
