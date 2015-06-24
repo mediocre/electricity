@@ -259,7 +259,7 @@ describe('electricity.static', function() {
             };
             midware(req,res,next);
         });
-        
+
         it('sends a 302 redirect if the hash does not match the current file', function(done) {
             var redirected = false;
             req.path = '/robots-ca121b5d03245bf82db00d1455555555.txt';
@@ -1272,15 +1272,18 @@ describe('electricity.static', function() {
         });
 
         // Make a directory, wait a while to make sure it doesn't break anything, then remove it.
-        it('should not crash when a directory is added or removed', function (done) {
-            assert.doesNotThrow(function() {
-                fs.mkdir('test/public/watchTestDir', function(err) {
-                    if (err) throw err;
-                    setTimeout(function() {
-                        fs.rmdir('test/public/watchTestDir', function(err) {
-                            done();
-                        });
-                    }, 10000);
+        it('should not crash when a directory is added or removed', function(done) {
+            fs.rmdir('test/public/watchTestDir', function() {
+                assert.doesNotThrow(function() {
+                    fs.mkdir('test/public/watchTestDir', function(err) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        setTimeout(function() {
+                            fs.rmdir('test/public/watchTestDir', done);
+                        }, 10000);
+                    });
                 });
             });
         });
