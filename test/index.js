@@ -3,6 +3,7 @@ var fs = require('fs');
 var zlib = require('zlib');
 var electricity = require('../lib/index');
 var bufCompare = require('buffer-compare');
+var diff = require('diff');
 var req;
 var res;
 var next;
@@ -420,7 +421,7 @@ describe('electricity.static', function() {
                     done();
                 },
                 end: function() {
-                    assert.fail(asset, '', 'Should send content');
+                    assert.fail('called end', 'called send', 'Should send content');
                 }
             };
             next = function() {
@@ -546,7 +547,7 @@ describe('electricity.static', function() {
                     done();
                 },
                 end: function() {
-                    assert.fail(asset, '', 'Should send content');
+                    assert.fail('called end', 'called send', 'Should send content');
                 }
             };
             next = function() {
@@ -695,6 +696,29 @@ describe('electricity.static', function() {
                 req.path = '/styles/image_path-4b176d19bfb77386cd6ca03378b17349.css';
 
                 res = {
+                    redirect: function(url) {
+                        req.path = url;
+                        midware(req,
+                                {
+                                    redirect: function() {
+                                        assert.fail('looped redirect', 'called send', 'Incorrect redirect');
+                                    },
+                                    set: function() {},
+                                    status: function(number) {
+                                        if (number >= 400) {
+                                            assert.fail(number, '400', 'Failing status code', '<');
+                                        }
+                                    },
+                                    send: function(asset) {
+                                        fs.readFile('test/public/styles/compiled/image_path.css', function(err, data) {
+                                            console.log(diff.diffCss(asset, data.toString()));
+                                            assert.fail(data.toString(), asset, 'Redirect triggered');
+                                            done();
+                                        });
+                                    }
+                                },
+                                next);
+                    },
                     set: function() {},
                     status: function(number) {
                         if (number >= 400) {
@@ -703,6 +727,7 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/styles/compiled/image_path.css', function(err, data) {
+                            console.log(diff.diffCss(asset, data.toString()));
                             assert.equal(data.toString(), asset);
                             done();
                         });
@@ -1465,6 +1490,7 @@ describe('electricity.static', function() {
             assert.equal(req.app.locals.electricity.url('/robots.txt?abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc');
             assert.equal(req.app.locals.electricity.url('/robots.txt#abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt#abc');
             assert.equal(req.app.locals.electricity.url('/robots.txt?abc#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc#def');
+            assert.equal(req.app.locals.electricity.url('/robots.txt?#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?#def');
             done();
         });
 
