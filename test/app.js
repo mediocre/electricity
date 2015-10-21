@@ -9,7 +9,9 @@ app.set('view engine', 'ejs');
 
 app.use(
     electricity.static((__dirname + '/public'), {
-        snockets: { ignore: /compiled/ }
+        sass: { imagePath: '/images/' },
+        snockets: { ignore: /compiled/ },
+        uglifycss: { enabled: false }
     })
 );
 
