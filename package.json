@@ -12,10 +12,9 @@
     "watch": "0.10.x"
   },
   "devDependencies": {
-    "buffer-compare": "0.0.1",
-    "diff": "2.1.x",
+    "buffer-compare": "*",
     "ejs": "*",
-    "express": "3.x",
+    "express": "*",
     "mocha": "*"
   },
   "keywords": [
