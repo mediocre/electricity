@@ -34,5 +34,5 @@
     "test": "mocha --reporter spec -t 21000",
     "watch": "mocha --reporter spec -w -g watcher -i"
   },
-  "version": "1.3.2"
+  "version": "1.4.0"
 }
