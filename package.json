@@ -13,9 +13,8 @@
   },
   "devDependencies": {
     "buffer-compare": "*",
-    "express": "*",
-    "diff": "2.1.x",
     "ejs": "*",
+    "express": "*",
     "mocha": "*"
   },
   "keywords": [

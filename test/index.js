@@ -3,7 +3,6 @@ var fs = require('fs');
 var zlib = require('zlib');
 var electricity = require('../lib/index');
 var bufCompare = require('buffer-compare');
-var diff = require('diff');
 var req;
 var res;
 var next;
@@ -711,7 +710,6 @@ describe('electricity.static', function() {
                                     },
                                     send: function(asset) {
                                         fs.readFile('test/public/styles/compiled/image_path.css', function(err, data) {
-                                            console.log(diff.diffCss(asset, data.toString()));
                                             assert.fail(data.toString(), asset, 'Redirect triggered');
                                             done();
                                         });
@@ -727,7 +725,6 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/styles/compiled/image_path.css', function(err, data) {
-                            console.log(diff.diffCss(asset, data.toString()));
                             assert.equal(data.toString(), asset);
                             done();
                         });
