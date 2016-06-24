@@ -906,7 +906,7 @@ describe('electricity.static', function() {
 
         describe('snockets support', function() {
             it('should serve Javascript with required files included', function(done) {
-                req.path = '/scripts/main-8cd310a95adbf422da5aaf41cd297391.js';
+                req.path = '/scripts/main-aaea1bf2c48059ec0ea89b0c7f9096f5.js';
 
                 res = {
                     set: function() {},
@@ -917,7 +917,7 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
-                            assert.equal(data.toString().trim(), asset.trim());
+                            assert.equal(asset.trim(), data.toString().trim());
                             done();
                         });
                     },
@@ -1011,7 +1011,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/jsx/reactTest-7395facc374e6291d47dca4a65079b64.js';
+                req.path = '/jsx/reactTest-a2cf8d99aecea8ff30b5476c71bbe4d4.js';
 
                 res = {
                     set: function() {},
@@ -1022,7 +1022,7 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/jsx/compiled/reactTest.js', function(err, data) {
-                            assert.equal(data.toString().trim(), asset.trim());
+                            assert.equal(asset.trim(), data.toString().trim());
                             done();
                         });
                     },
@@ -1046,7 +1046,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/jsx/reactSnockets-dc298f48403615e1c74c49dce29764f4.js';
+                req.path = '/jsx/reactSnockets-b4351794e3947ec6048f984b3d8eb5e6.js';
 
                 res = {
                     set: function() {},
@@ -1057,7 +1057,7 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/jsx/compiled/reactSnockets.js', function(err, data) {
-                            assert.equal(data.toString().trim(), asset.trim());
+                            assert.equal(asset.trim(), data.toString().trim());
                             done();
                         });
                     },
@@ -1408,7 +1408,7 @@ describe('electricity.static', function() {
             it('should recompile dependents when a watched js file changes', function(done) {
                 fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1.1\');\n', function(err) {
                     setTimeout(function() {
-                        req.path = '/scripts/main-7e7fa62f73fc7df9f66616c7c7fbf9a2.js';
+                        req.path = '/scripts/main-7b3a2f595d092c9ff2b60ab5c726c505.js';
 
                         res = {
                             set: function() {},
@@ -1419,7 +1419,7 @@ describe('electricity.static', function() {
                             },
                             send: function(asset) {
                                 fs.readFile('test/public/scripts/compiled/main2.js', function(err, data) {
-                                    assert.equal(data.toString().trim(), asset.toString().trim());
+                                    assert.equal(asset.toString().trim(), data.toString().trim());
                                     done();
                                 });
                             },
@@ -1445,7 +1445,7 @@ describe('electricity.static', function() {
                     setTimeout(function() {
                         fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function(err) {
                             setTimeout(function() {
-                                req.path = '/scripts/main2-8cd310a95adbf422da5aaf41cd297391.js';
+                                req.path = '/scripts/main2-aaea1bf2c48059ec0ea89b0c7f9096f5.js';
 
                                 res = {
                                     set: function() {},
@@ -1456,7 +1456,7 @@ describe('electricity.static', function() {
                                     },
                                     send: function(asset) {
                                         fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
-                                            assert.equal(data.toString().trim(), asset.trim());
+                                            assert.equal(asset.trim(), data.toString().trim());
                                             done();
                                         });
                                     },
