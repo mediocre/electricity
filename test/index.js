@@ -137,9 +137,14 @@ describe('electricity.static', function() {
             midware(req, res, next);
         });
 
-        it.skip('calls res.send with asset contents if the asset does exist', function(done) {
+        it('calls res.redirect to the hash-appeneded url if the asset does exist', function(done) {
+            var redirected = false;
             req.path = '/robots.txt';
             res = {
+                redirect: function(url) {
+                    assert.equal(url, '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+                    done();
+                },
                 set: function(){},
                 status: function(number) {
                     if (number >= 400) {
@@ -147,14 +152,11 @@ describe('electricity.static', function() {
                     }
                 },
                 send: function(asset) {
-                    fs.readFile('test/public/robots.txt', function(err, data) {
-                        assert.equal(bufCompare(data, asset), 0);
-                        done();
-                    });
+                    assert.fail('called send', 'called redirect', 'Incorrect routing', ', instead');
                 }
             };
             next = function() {
-                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                assert.fail('called next', 'called redirect', 'Incorrect routing', ', instead');
             };
             midware(req,res,next);
         });
@@ -1182,7 +1184,7 @@ describe('electricity.static', function() {
                 var minWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
                     uglifycss: {
-                        enabled: true,
+                        enabled: true
                     },
                     uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
@@ -1215,7 +1217,7 @@ describe('electricity.static', function() {
                 var minWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
                     uglifycss: {
-                        enabled: true,
+                        enabled: true
                     },
                     uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
@@ -1242,6 +1244,42 @@ describe('electricity.static', function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
                 minWare(req, res, next);
+            });
+        });
+
+        describe('when hashify is set to false', function() {
+            var midwareWithNoHash;
+            before(function() {
+                midwareWithNoHash = electricity.static('test/public', {
+                    hashify: false,
+                    sass: { imagePath: '/images/' },
+                    snockets: { ignore: /compiled/ },
+                    uglifyjs: { enabled: false },
+                    uglifycss: { enabled: false }
+                });
+
+            });
+
+            it('should not redirect an unhashed request', function(done) {
+                req.path = '/robots.txt';
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/robots.txt', function(err, data) {
+                            assert.equal(bufCompare(data, asset), 0);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midwareWithNoHash(req,res,next);
             });
         });
     });
@@ -1520,6 +1558,26 @@ describe('electricity.static', function() {
             assert.equal(req.app.locals.electricity.url('/robots.txt?abc#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc#def');
             assert.equal(req.app.locals.electricity.url('/robots.txt?#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?#def');
             done();
+        });
+
+        describe('when hashify is set to false', function() {
+            var midwareWithNoHash;
+            before(function() {
+                midwareWithNoHash = electricity.static('test/public', {
+                    hashify: false,
+                    sass: { imagePath: '/images/' },
+                    snockets: { ignore: /compiled/ },
+                    uglifyjs: { enabled: false },
+                    uglifycss: { enabled: false }
+                });
+
+            });
+
+            it('should not append a hash', function(done) {
+                midwareWithNoHash(req,res,next);
+                assert.equal(req.app.locals.electricity.url('robots.txt'), '/robots.txt');
+                done();
+            });
         });
 
         describe('with the hostname option', function() {
