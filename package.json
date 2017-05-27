@@ -33,5 +33,5 @@
     "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec -t 21000 && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test": "mocha -R spec -t 21000"
   },
-  "version": "1.7.0"
+  "version": "1.8.0"
 }
