@@ -147,11 +147,21 @@ describe('electricity.static', function() {
     describe('The middleware', function() {
         it('calls next if the asset does not exist', function(done) {
             next = done;
+
             res.status = function(number) {
                 if (number >= 400) {
                     assert.fail(number, '400', 'Failing status code', '<');
                 }
             };
+
+            midware(req, res, next);
+        });
+
+        it('calls next if the request method is not GET or HEAD', function(done) {
+            next = done;
+
+            req.method = 'POST';
+
             midware(req, res, next);
         });
 
@@ -177,13 +187,15 @@ describe('electricity.static', function() {
             next = function() {
                 assert.fail('called next', 'called redirect', 'Incorrect routing', ', instead');
             };
+
             midware(req,res,next);
         });
 
         it('calls res.send with asset contents if the asset does exist and has its hash appended', function(done) {
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+
             res = {
-                set: function(){},
+                set: function() {},
                 status: function(number) {
                     if (number >= 400) {
                         assert.fail(number, '400', 'Failing status code', '<');
@@ -196,9 +208,11 @@ describe('electricity.static', function() {
                     });
                 }
             };
+
             next = function() {
                 assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
+
             midware(req,res,next);
         });
 
@@ -454,16 +468,19 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
 
-        it.skip('should return status 304 if the modified date is the same as the file\'s', function(done) {
+        it('should return status 304 if the modified date is the same as the file\'s', function(done) {
             var headerSet = false;
             var statusSet = false;
+
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+
             req.get = function(header) {
                 var mtime = fs.statSync('test/public/robots.txt').mtime;
                 if (header === 'If-Modified-Since') {
                     return mtime.toUTCString();
                 }
             };
+
             res = {
                 set: function(headers) {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
@@ -488,10 +505,12 @@ describe('electricity.static', function() {
                     done();
                 }
             };
+
             next = function() {
                 assert.fail('called next', 'called end', 'Incorrect routing', ', instead');
             };
-            midware(req,res,next);
+
+            midware(req, res, next);
         });
 
         it('should return status 304 if the modified date is later than the file\'s', function(done) {
