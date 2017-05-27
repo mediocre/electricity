@@ -138,23 +138,24 @@ describe('electricity.static', function() {
         });
 
         it('calls res.redirect to the hash-appeneded url if the asset does exist', function(done) {
-            var redirected = false;
             req.path = '/robots.txt';
+
             res = {
                 redirect: function(url) {
                     assert.equal(url, '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
                     done();
                 },
-                set: function(){},
+                set: function() {},
                 status: function(number) {
                     if (number >= 400) {
                         assert.fail(number, '400', 'Failing status code', '<');
                     }
                 },
-                send: function(asset) {
+                send: function() {
                     assert.fail('called send', 'called redirect', 'Incorrect routing', ', instead');
                 }
             };
+
             next = function() {
                 assert.fail('called next', 'called redirect', 'Incorrect routing', ', instead');
             };
@@ -396,11 +397,13 @@ describe('electricity.static', function() {
             var headerSet = false;
             var statusSet = false;
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+
             req.get = function(header) {
                 if (header === 'If-None-Match') {
                     return 'da121b5d03245bf82db00d14cee04e22';
                 }
             };
+
             res = {
                 set: function(headers) {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
@@ -416,7 +419,7 @@ describe('electricity.static', function() {
                     assert.equal(number, 200, 'Wrong status: ' + number);
                     statusSet = true;
                 },
-                send: function(asset) {
+                send: function() {
                     assert(statusSet, 'Status was not set correctly');
                     assert(headerSet, 'Headers were not set correctly');
                     done();
@@ -425,9 +428,11 @@ describe('electricity.static', function() {
                     assert.fail('called end', 'called send', 'Should send content');
                 }
             };
+
             next = function() {
                 assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
+
             midware(req,res,next);
         });
 
@@ -519,7 +524,9 @@ describe('electricity.static', function() {
         it('should send if the modified date is earlier than the file\'s', function(done) {
             var headerSet = false;
             var statusSet = false;
+
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+
             req.get = function(header) {
                 var mtime = fs.statSync('test/public/robots.txt').mtime;
                 mtime.setMinutes(mtime.getMinutes() - 1);
@@ -527,6 +534,7 @@ describe('electricity.static', function() {
                     return mtime.toUTCString();
                 }
             };
+
             res = {
                 set: function(headers) {
                     var mtime = fs.statSync('test/public/robots.txt').mtime;
@@ -542,7 +550,7 @@ describe('electricity.static', function() {
                     assert.equal(number, 200, 'Wrong status: ' + number);
                     statusSet = true;
                 },
-                send: function(asset) {
+                send: function() {
                     assert(headerSet, 'Headers were not set correctly');
                     assert(statusSet, 'Status was not set correctly');
                     done();
@@ -551,9 +559,11 @@ describe('electricity.static', function() {
                     assert.fail('called end', 'called send', 'Should send content');
                 }
             };
+
             next = function() {
                 assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
             };
+
             midware(req,res,next);
         });
 
@@ -1379,7 +1389,7 @@ describe('electricity.static', function() {
 
         describe('with SASS', function() {
             it('should recompile dependents when a watched scss file changes', function(done) {
-                fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function(err) {
+                fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function() {
                     setTimeout(function() {
                         req.path = '/styles/include_path-9b14cc07f2e430cafc9f6661e43638db.css';
                         res = {
@@ -1412,7 +1422,7 @@ describe('electricity.static', function() {
                 var copy = fs.createWriteStream('test/public/styles/include_path_copy.scss');
                 original.on('end', function() {
                     setTimeout(function() {
-                        fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function(err) {
+                        fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function() {
                         setTimeout(function() {
                             req.path = '/styles/include_path_copy-757ae8512d2a003fe6079c7a7216f8e9.css';
                             res = {
@@ -1451,9 +1461,9 @@ describe('electricity.static', function() {
             });
         });
 
-        describe('with snockets', function(done) {
+        describe('with snockets', function() {
             it('should recompile dependents when a watched js file changes', function(done) {
-                fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1.1\');\n', function(err) {
+                fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1.1\');\n', function() {
                     setTimeout(function() {
                         req.path = '/scripts/main-8ebef9643de3549f70271ec51a402b26.js';
 
@@ -1490,7 +1500,7 @@ describe('electricity.static', function() {
 
                 original.on('end', function() {
                     setTimeout(function() {
-                        fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function(err) {
+                        fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function() {
                             setTimeout(function() {
                                 req.path = '/scripts/main2-c6c2afd452d98199939fb7c292c5474b.js';
 
