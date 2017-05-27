@@ -1,5 +1,8 @@
-Electricity
-===========
+# Electricity
+
+[![Build Status](https://travis-ci.org/mediocre/electricity.svg?branch=master)](https://travis-ci.org/mediocre/electricity)
+
+[![Coverage Status](https://coveralls.io/repos/github/mediocre/electricity/badge.svg?branch=master)](https://coveralls.io/github/mediocre/electricity?branch=master)
 
 An alternative to the built-in Express middleware for serving static files.
 Electricity follows a number of best practices for making web pages fast.

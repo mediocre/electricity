@@ -1,2 +1,4 @@
-node_modules
+.coveralls.yml
 .DS_Store
+coverage
+node_modules

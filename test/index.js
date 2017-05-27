@@ -1080,7 +1080,9 @@ describe('electricity.static', function() {
                     uglifyjs: { enabled: true },
                     watch: { enabled: false }
                 });
+
                 req.path = '/jsx/reactSnockets-672b7d0ee298f0668d4ca6372262bc43.js';
+
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -1090,6 +1092,7 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/jsx/compiled/reactSnockets.min.js', function(err, data) {
+                            assert.ifError(err);
                             assert.equal(data.toString(), asset);
                             done();
                         });
@@ -1098,9 +1101,11 @@ describe('electricity.static', function() {
                         assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 jsxMiddleware(req, res, next);
             });
         });
@@ -1118,7 +1123,9 @@ describe('electricity.static', function() {
                     },
                     watch: { enabled: false }
                 });
+
                 req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
+
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -1136,9 +1143,11 @@ describe('electricity.static', function() {
                         assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 minWare(req, res, next);
             });
             it('should should not crash if minification fails', function(done) {
