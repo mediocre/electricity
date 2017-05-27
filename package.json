@@ -3,7 +3,7 @@
   "dependencies": {
     "mime": "1.3.x",
     "negotiator": "0.6.x",
-    "node-sass": "3.11.x",
+    "node-sass": "4.5.x",
     "react-tools": "0.13.x",
     "sass-graph": "2.2.x",
     "snockets": "1.3.x",

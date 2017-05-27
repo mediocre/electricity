@@ -136,6 +136,12 @@ describe('electricity.static', function() {
                 watch: { enabled: false }
             });
         });
+
+        it('should allow sass.functions', function() {
+            electricity.static('test/public', {
+                sass: { functions: {} }
+            });
+        });
     });
 
     describe('The middleware', function() {
