@@ -71,6 +71,7 @@ Default options look like this:
 
 ```javascript
 var options = {
+    hashify: true,
     headers: {},
     hostname: '',
     sass: {},
@@ -91,6 +92,7 @@ You can override the default options to look something like this:
 
 ```javascript
 var options = {
+    hashify: false, // Do not generate hashes for URLs
     headers: { 'Access-Control-Allow-Origin': 'http://foo.example' },
     hostname: 'cdn.example.com', // CDN hostname
     jsx: { // Object passed straight to react-tools options
