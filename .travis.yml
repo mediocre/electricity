@@ -1,6 +1,10 @@
 after_success:
   - npm run coveralls
 
+before_script:
+  - npm i -g eslint
+  - eslint .
+
 language: node_js
 
 node_js:
