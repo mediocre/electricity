@@ -1,8 +1,11 @@
-var assert = require('assert');
-var fs = require('fs');
-var zlib = require('zlib');
-var electricity = require('../lib/index');
-var bufCompare = require('buffer-compare');
+const assert = require('assert');
+const fs = require('fs');
+const zlib = require('zlib');
+
+const bufCompare = require('buffer-compare');
+
+const electricity = require('../lib/index');
+
 var req;
 var res;
 var next;
@@ -52,6 +55,15 @@ describe('electricity.static', function() {
 
     it('returns a function', function(done) {
         assert.equal(typeof midware, 'function');
+
+        done();
+    });
+
+    it('should default to "public" if the directory isn’t specified', function(done) {
+        assert.throws(function() {
+            electricity.static();
+        }, /public/);
+
         done();
     });
 
@@ -59,6 +71,7 @@ describe('electricity.static', function() {
         assert.throws(function() {
             electricity.static('test/nope');
         });
+
         done();
     });
 
@@ -66,10 +79,9 @@ describe('electricity.static', function() {
         assert.throws(function() {
             electricity.static('package.json');
         });
+
         done();
     });
-
-    it('should throw if permissions are insufficent');
 
     describe('with options', function() {
         it('throws an error if the hostname is not falsy or a string', function() {
@@ -638,11 +650,28 @@ describe('electricity.static', function() {
             req.app = {
                 locals: {}
             };
+
             next = function() {
                 assert.equal(typeof req.app.locals.electricity.url, 'function');
                 done();
             };
-            midware(req,res,next);
+
+            midware(req, res, next);
+        });
+
+        it('only needs to registers an EJS helper once', function(done) {
+            req.app = {
+                locals: {}
+            };
+
+            midware(req, res, function() {
+                assert.equal(typeof req.app.locals.electricity.url, 'function');
+
+                midware(req, res, function() {
+                    assert.equal(typeof req.app.locals.electricity.url, 'function');
+                    done();
+                });
+            });
         });
 
         describe('SASS support', function() {
