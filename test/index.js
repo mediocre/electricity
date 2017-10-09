@@ -39,18 +39,21 @@ function setupPassthrough() {
 }
 
 describe('electricity.static', function() {
-    before(function() {
+    before(function(done) {
         midware = electricity.static('test/public', {
             sass: { imagePath: '/images/' },
             snockets: { ignore: /compiled/ },
             uglifyjs: { enabled: false },
             uglifycss: { enabled: false }
         });
+
+        setImmediate(done);
     });
 
     // Set up default mocks before each test, override as needed
-    beforeEach(function() {
+    beforeEach(function(done) {
         setupPassthrough();
+        setImmediate(done);
     });
 
     it('returns a function', function(done) {
@@ -468,7 +471,7 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
 
-        it.skip('should return status 304 if the modified date is the same as the file’s', function(done) {
+        it('should return status 304 if the modified date is the same as the file’s', function(done) {
             var headerSet = false;
             var statusSet = false;
 
@@ -704,7 +707,10 @@ describe('electricity.static', function() {
         describe('SASS support', function() {
             before(function(done) {
                 fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function(err) {
-                    if (err) throw err;
+                    if (err) {
+                        throw err;
+                    }
+
                     done();
                 });
             });
@@ -1218,6 +1224,7 @@ describe('electricity.static', function() {
 
                 minWare(req, res, next);
             });
+
             it('should should not crash if minification fails', function(done) {
                 var minWare = electricity.static('test/public', {
                     snockets: { ignore: 'compiled' },
@@ -1359,14 +1366,112 @@ describe('electricity.static', function() {
         });
     });
 
+    describe('The url helper', function() {
+        it('should append the hash of an asset if the asset is present', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('/robots.txt'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+            done();
+        });
+
+        it('should insert the hash in the correct place', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('/robots-abc1de.home.txt'), '/robots-abc1de.home-ca121b5d03245bf82db00d14cee04e22.txt');
+            done();
+        });
+
+        it('should fix relative paths to the route assets are served from', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('robots.txt'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+            done();
+        });
+
+        it('should leave the path alone if the asset is not present', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('nope.gif'), 'nope.gif');
+            done();
+        });
+
+        it('should preserve query and targets', function(done) {
+            midware(req, res, next);
+            assert.equal(req.app.locals.electricity.url('/robots.txt?abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc');
+            assert.equal(req.app.locals.electricity.url('/robots.txt#abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt#abc');
+            assert.equal(req.app.locals.electricity.url('/robots.txt?abc#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc#def');
+            assert.equal(req.app.locals.electricity.url('/robots.txt?#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?#def');
+            done();
+        });
+
+        describe('when hashify is set to false', function() {
+            var midwareWithNoHash;
+            before(function() {
+                midwareWithNoHash = electricity.static('test/public', {
+                    hashify: false,
+                    sass: { imagePath: '/images/' },
+                    snockets: { ignore: /compiled/ },
+                    uglifyjs: { enabled: false },
+                    uglifycss: { enabled: false }
+                });
+
+            });
+
+            it('should not append a hash', function(done) {
+                midwareWithNoHash(req,res,next);
+                assert.equal(req.app.locals.electricity.url('robots.txt'), '/robots.txt');
+                done();
+            });
+        });
+
+        describe('with the hostname option', function() {
+            it('should prepend the hostname if specified', function(done) {
+                var cdnMidware = electricity.static('test/public', {
+                    hostname: 'cdn.example.com',
+                    snockets: { ignore: /compiled/ },
+                    uglifyjs: { ignore: /failure/ },
+                    watch: { enabled: false }
+                });
+                cdnMidware(req, res, next);
+                assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+                done();
+            });
+
+            it('should handle hostnames with trailing slashes', function(done) {
+                var cdnMidware = electricity.static('test/public', {
+                    hostname: 'cdn.example.com/',
+                    snockets: { ignore: /compiled/ },
+                    uglifyjs: { ignore: /failure/ },
+                    watch: { enabled: false }
+                });
+                cdnMidware(req, res, next);
+                assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+                done();
+            });
+        });
+    });
+
     describe('The file watcher', function() {
+        var middleware;
+
+        beforeEach(function(done) {
+             middleware = electricity.static('test/public', {
+                sass: { imagePath: '/images/' },
+                snockets: { ignore: /compiled/ },
+                uglifyjs: { enabled: false },
+                uglifycss: { enabled: false }
+            });
+
+            setImmediate(done);
+        });
+
         it('should create a cache entry when a file is created', function(done) {
-            fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function (err) {
-                if (err) throw err;
-                setTimeout(function () {
+            fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function(err) {
+                if (err) {
+                    throw err;
+                }
+
+                setTimeout(function() {
                     req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
+
                     res = {
-                        set: function(){},
+                        set: function() {},
                         status: function(number) {
                             if (number >= 400) {
                                 assert.fail(number, '400', 'Failing status code', '<');
@@ -1379,10 +1484,12 @@ describe('electricity.static', function() {
                             });
                         }
                     };
+
                     next = function() {
                         assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                     };
-                    midware(req, res, next);
+
+                    middleware(req, res, next);
                 }, 10000);
             });
         });
@@ -1546,7 +1653,7 @@ describe('electricity.static', function() {
                         };
 
                         midware(req, res, next);
-                    }, 10000);
+                    }, 5000);
                 });
             });
 
@@ -1582,10 +1689,10 @@ describe('electricity.static', function() {
                                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                                 };
 
-                                midware(req, res, next);
-                            }, 10000);
+                                middleware(req, res, next);
+                            }, 5000);
                         });
-                    }, 10000);
+                    }, 5000);
                 });
 
                 original.pipe(copy);
@@ -1593,91 +1700,12 @@ describe('electricity.static', function() {
 
             after(function(done) {
                 fs.unlink('test/public/scripts/main2.js', function(err) {
-                    if (err) throw err;
+                    if (err) {
+                        throw err;
+                    }
+
                     done();
                 });
-            });
-        });
-
-    });
-
-    describe('The url helper', function() {
-        it('should append the hash of an asset if the asset is present', function(done) {
-            midware(req, res, next);
-            assert.equal(req.app.locals.electricity.url('/robots.txt'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
-            done();
-        });
-
-        it('should insert the hash in the correct place', function(done) {
-            midware(req, res, next);
-            assert.equal(req.app.locals.electricity.url('/robots-abc1de.home.txt'), '/robots-abc1de.home-ca121b5d03245bf82db00d14cee04e22.txt');
-            done();
-        });
-
-        it('should fix relative paths to the route assets are served from', function(done) {
-            midware(req, res, next);
-            assert.equal(req.app.locals.electricity.url('robots.txt'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
-            done();
-        });
-
-        it('should leave the path alone if the asset is not present', function(done) {
-            midware(req, res, next);
-            assert.equal(req.app.locals.electricity.url('nope.gif'), 'nope.gif');
-            done();
-        });
-
-        it('should preserve query and targets', function(done) {
-            midware(req, res, next);
-            assert.equal(req.app.locals.electricity.url('/robots.txt?abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc');
-            assert.equal(req.app.locals.electricity.url('/robots.txt#abc'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt#abc');
-            assert.equal(req.app.locals.electricity.url('/robots.txt?abc#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?abc#def');
-            assert.equal(req.app.locals.electricity.url('/robots.txt?#def'), '/robots-ca121b5d03245bf82db00d14cee04e22.txt?#def');
-            done();
-        });
-
-        describe('when hashify is set to false', function() {
-            var midwareWithNoHash;
-            before(function() {
-                midwareWithNoHash = electricity.static('test/public', {
-                    hashify: false,
-                    sass: { imagePath: '/images/' },
-                    snockets: { ignore: /compiled/ },
-                    uglifyjs: { enabled: false },
-                    uglifycss: { enabled: false }
-                });
-
-            });
-
-            it('should not append a hash', function(done) {
-                midwareWithNoHash(req,res,next);
-                assert.equal(req.app.locals.electricity.url('robots.txt'), '/robots.txt');
-                done();
-            });
-        });
-
-        describe('with the hostname option', function() {
-            it('should prepend the hostname if specified', function(done) {
-                var cdnMidware = electricity.static('test/public', {
-                    hostname: 'cdn.example.com',
-                    snockets: { ignore: /compiled/ },
-                    uglifyjs: { ignore: /failure/ },
-                    watch: { enabled: false }
-                });
-                cdnMidware(req, res, next);
-                assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
-                done();
-            });
-
-            it('should handle hostnames with trailing slashes', function(done) {
-                var cdnMidware = electricity.static('test/public', {
-                    hostname: 'cdn.example.com/',
-                    snockets: { ignore: /compiled/ },
-                    uglifyjs: { ignore: /failure/ },
-                    watch: { enabled: false }
-                });
-                cdnMidware(req, res, next);
-                assert.equal(req.app.locals.electricity.url('robots.txt'), '//cdn.example.com/robots-ca121b5d03245bf82db00d14cee04e22.txt');
-                done();
             });
         });
     });
