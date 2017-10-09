@@ -819,6 +819,7 @@ describe('electricity.static', function() {
                     uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
+
                 req.path = '/styles/image_path-58c7e927b74b217b2796c4cafc3e8d27.css';
 
                 res = {
@@ -1448,19 +1449,6 @@ describe('electricity.static', function() {
     });
 
     describe('The file watcher', function() {
-        var middleware;
-
-        beforeEach(function(done) {
-             middleware = electricity.static('test/public', {
-                sass: { imagePath: '/images/' },
-                snockets: { ignore: /compiled/ },
-                uglifyjs: { enabled: false },
-                uglifycss: { enabled: false }
-            });
-
-            setImmediate(done);
-        });
-
         it('should create a cache entry when a file is created', function(done) {
             fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function(err) {
                 if (err) {
@@ -1489,7 +1477,7 @@ describe('electricity.static', function() {
                         assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                     };
 
-                    middleware(req, res, next);
+                    midware(req, res, next);
                 }, 10000);
             });
         });
@@ -1689,7 +1677,7 @@ describe('electricity.static', function() {
                                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                                 };
 
-                                middleware(req, res, next);
+                                midware(req, res, next);
                             }, 5000);
                         });
                     }, 5000);
