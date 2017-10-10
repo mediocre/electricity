@@ -1450,6 +1450,8 @@ describe('electricity.static', function() {
 
     describe('The file watcher', function() {
         it('should create a cache entry when a file is created', function(done) {
+            var middleware = electricity.static('test/public');
+
             fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function(err) {
                 if (err) {
                     throw err;
@@ -1477,16 +1479,22 @@ describe('electricity.static', function() {
                         assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                     };
 
-                    midware(req, res, next);
-                }, 10000);
+                    middleware(req, res, next);
+                }, 1000);
             });
         });
 
         it('should update a cache entry when a file is changed', function(done) {
+            var middleware = electricity.static('test/public');
+
             fs.appendFile('test/public/watchTest.txt', 'MORE DATA', function(err) {
-                if (err) throw err;
+                if (err) {
+                    throw err;
+                }
+
                 setTimeout(function() {
                     req.path = '/watchTest-e4b18591cbef3ac24e02ba0e0c44e97e.txt';
+
                     res = {
                         set: function() {},
                         status: function(number) {
@@ -1501,23 +1509,28 @@ describe('electricity.static', function() {
                             });
                         }
                     };
+
                     next = function() {
                         assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                     };
-                    midware(req, res, next);
-                }, 10000);
+
+                    middleware(req, res, next);
+                }, 1000);
             });
         });
 
         it('should remove a cache entry when a file is deleted', function(done) {
             fs.unlink('test/public/watchTest.txt', function(err) {
-                if (err) throw err;
+                if (err) {
+                    throw err;
+                }
+
                 setTimeout(function() {
                     setupPassthrough();
                     next = done;
                     req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
                     midware(req, res, next);
-                }, 10000);
+                }, 1000);
             });
         });
 
@@ -1532,7 +1545,7 @@ describe('electricity.static', function() {
 
                         setTimeout(function() {
                             fs.rmdir('test/public/watchTestDir', done);
-                        }, 10000);
+                        }, 1000);
                     });
                 });
             });
@@ -1606,7 +1619,10 @@ describe('electricity.static', function() {
 
             after(function(done) {
                 fs.unlink('test/public/styles/include_path_copy.scss', function(err) {
-                    if (err) throw err;
+                    if (err) {
+                        throw err;
+                    }
+
                     done();
                 });
             });
@@ -1646,6 +1662,10 @@ describe('electricity.static', function() {
             });
 
             it('should also recompile dependents for files added after load', function(done) {
+                var middleware = electricity.static('test/public', {
+                    uglifyjs: { enabled: false }
+                });
+
                 var original = fs.createReadStream('test/public/scripts/main.js');
                 var copy = fs.createWriteStream('test/public/scripts/main2.js');
 
@@ -1677,10 +1697,10 @@ describe('electricity.static', function() {
                                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                                 };
 
-                                midware(req, res, next);
-                            }, 5000);
+                                middleware(req, res, next);
+                            }, 1000);
                         });
-                    }, 5000);
+                    }, 1000);
                 });
 
                 original.pipe(copy);
