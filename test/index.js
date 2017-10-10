@@ -1452,71 +1452,75 @@ describe('electricity.static', function() {
         it('should create a cache entry when a file is created', function(done) {
             var middleware = electricity.static('test/public');
 
-            fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function(err) {
-                if (err) {
-                    throw err;
-                }
+            setTimeout(function() {
+                fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function(err) {
+                    if (err) {
+                        throw err;
+                    }
 
-                setTimeout(function() {
-                    req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
+                    setTimeout(function() {
+                        req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
 
-                    res = {
-                        set: function() {},
-                        status: function(number) {
-                            if (number >= 400) {
-                                assert.fail(number, '400', 'Failing status code', '<');
+                        res = {
+                            set: function() {},
+                            status: function(number) {
+                                if (number >= 400) {
+                                    assert.fail(number, '400', 'Failing status code', '<');
+                                }
+                            },
+                            send: function(asset) {
+                                fs.readFile('test/public/watchTest.txt', function(err, data) {
+                                    assert.equal(bufCompare(data, asset), 0);
+                                    done();
+                                });
                             }
-                        },
-                        send: function(asset) {
-                            fs.readFile('test/public/watchTest.txt', function(err, data) {
-                                assert.equal(bufCompare(data, asset), 0);
-                                done();
-                            });
-                        }
-                    };
+                        };
 
-                    next = function() {
-                        assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                    };
+                        next = function() {
+                            assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                        };
 
-                    middleware(req, res, next);
-                }, 1000);
-            });
+                        middleware(req, res, next);
+                    }, 1000);
+                });
+            }, 1000);
         });
 
         it('should update a cache entry when a file is changed', function(done) {
             var middleware = electricity.static('test/public');
 
-            fs.appendFile('test/public/watchTest.txt', 'MORE DATA', function(err) {
-                if (err) {
-                    throw err;
-                }
+            setTimeout(function() {
+                fs.appendFile('test/public/watchTest.txt', 'MORE DATA', function(err) {
+                    if (err) {
+                        throw err;
+                    }
 
-                setTimeout(function() {
-                    req.path = '/watchTest-e4b18591cbef3ac24e02ba0e0c44e97e.txt';
+                    setTimeout(function() {
+                        req.path = '/watchTest-e4b18591cbef3ac24e02ba0e0c44e97e.txt';
 
-                    res = {
-                        set: function() {},
-                        status: function(number) {
-                            if (number >= 400) {
-                                assert.fail(number, '400', 'Failing status code', '<');
+                        res = {
+                            set: function() {},
+                            status: function(number) {
+                                if (number >= 400) {
+                                    assert.fail(number, '400', 'Failing status code', '<');
+                                }
+                            },
+                            send: function(asset) {
+                                fs.readFile('test/public/watchTest.txt', function(err, data) {
+                                    assert.equal(bufCompare(data, asset), 0);
+                                    done();
+                                });
                             }
-                        },
-                        send: function(asset) {
-                            fs.readFile('test/public/watchTest.txt', function(err, data) {
-                                assert.equal(bufCompare(data, asset), 0);
-                                done();
-                            });
-                        }
-                    };
+                        };
 
-                    next = function() {
-                        assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                    };
+                        next = function() {
+                            assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                        };
 
-                    middleware(req, res, next);
-                }, 1000);
-            });
+                        middleware(req, res, next);
+                    }, 1000);
+                });
+            }, 1000);
         });
 
         it('should remove a cache entry when a file is deleted', function(done) {
@@ -1666,44 +1670,46 @@ describe('electricity.static', function() {
                     uglifyjs: { enabled: false }
                 });
 
-                var original = fs.createReadStream('test/public/scripts/main.js');
-                var copy = fs.createWriteStream('test/public/scripts/main2.js');
+                setTimeout(function() {
+                    var original = fs.createReadStream('test/public/scripts/main.js');
+                    var copy = fs.createWriteStream('test/public/scripts/main2.js');
 
-                original.on('end', function() {
-                    setTimeout(function() {
-                        fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function() {
-                            setTimeout(function() {
-                                req.path = '/scripts/main2-c6c2afd452d98199939fb7c292c5474b.js';
+                    original.on('end', function() {
+                        setTimeout(function() {
+                            fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function() {
+                                setTimeout(function() {
+                                    req.path = '/scripts/main2-c6c2afd452d98199939fb7c292c5474b.js';
 
-                                res = {
-                                    set: function() {},
-                                    status: function(number) {
-                                        if (number >= 400) {
-                                            assert.fail(number, '400', 'Failing status code', '<');
+                                    res = {
+                                        set: function() {},
+                                        status: function(number) {
+                                            if (number >= 400) {
+                                                assert.fail(number, '400', 'Failing status code', '<');
+                                            }
+                                        },
+                                        send: function(asset) {
+                                            fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
+                                                assert.equal(asset.trim(), data.toString().trim());
+                                                done();
+                                            });
+                                        },
+                                        redirect: function(url) {
+                                            assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
                                         }
-                                    },
-                                    send: function(asset) {
-                                        fs.readFile('test/public/scripts/compiled/main.js', function(err, data) {
-                                            assert.equal(asset.trim(), data.toString().trim());
-                                            done();
-                                        });
-                                    },
-                                    redirect: function(url) {
-                                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
-                                    }
-                                };
+                                    };
 
-                                next = function() {
-                                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                                };
+                                    next = function() {
+                                        assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                                    };
 
-                                middleware(req, res, next);
-                            }, 1000);
-                        });
-                    }, 1000);
-                });
+                                    middleware(req, res, next);
+                                }, 1000);
+                            });
+                        }, 1000);
+                    });
 
-                original.pipe(copy);
+                    original.pipe(copy);
+                }, 1000);
             });
 
             after(function(done) {
