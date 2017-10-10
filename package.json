@@ -1,6 +1,7 @@
 {
   "description": "An alternative to the built-in Express middleware for serving static files. Electricity follows a number of best practices for making web pages fast.",
   "dependencies": {
+    "chokidar": "1.7.x",
     "mime": "2.0.x",
     "negotiator": "0.6.x",
     "node-sass": "4.5.x",
@@ -8,12 +9,12 @@
     "sass-graph": "2.2.x",
     "snockets": "1.3.x",
     "uglify-js": "3.1.x",
-    "uglifycss": "0.0.x",
-    "watch": "1.0.x"
+    "uglifycss": "0.0.x"
   },
   "devDependencies": {
     "buffer-compare": "*",
     "coveralls": "*",
+    "fs-extra": "*",
     "istanbul": "*",
     "mocha": "3.x"
   },
@@ -33,5 +34,5 @@
     "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec -t 21000 && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test": "mocha -R spec -t 21000"
   },
-  "version": "1.8.1"
+  "version": "2.0.0"
 }
