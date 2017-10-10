@@ -3,6 +3,7 @@ const fs = require('fs');
 const zlib = require('zlib');
 
 const bufCompare = require('buffer-compare');
+const fse = require('fs-extra');
 
 const electricity = require('../lib/index');
 
@@ -145,27 +146,48 @@ describe('electricity.static', function() {
                 sass: { functions: {} }
             });
         });
+
+        it('should not hashify if disabled', function(done) {
+            var middleware = electricity.static('test/public', {
+                hashify: false
+            });
+
+            setTimeout(function() {
+                req.path = '/robots.txt';
+
+                res = {
+                    redirect: function() {
+                        assert.fail('called redirect', 'called send');
+                    },
+                    set: function() {},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400');
+                        }
+                    },
+                    send: function() {
+                        done();
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send');
+                };
+
+                middleware(req, res, next);
+            }, 1000);
+        });
     });
 
     describe('The middleware', function() {
         it('calls next if the asset does not exist', function(done) {
-            next = done;
-
-            res.status = function(number) {
-                if (number >= 400) {
-                    assert.fail(number, '400', 'Failing status code', '<');
-                }
-            };
-
-            midware(req, res, next);
+            midware(req, res, done);
         });
 
         it('calls next if the request method is not GET or HEAD', function(done) {
-            next = done;
-
             req.method = 'POST';
 
-            midware(req, res, next);
+            midware(req, res, done);
         });
 
         it('calls res.redirect to the hash-appeneded url if the asset does exist', function(done) {
@@ -173,25 +195,13 @@ describe('electricity.static', function() {
 
             res = {
                 redirect: function(url) {
-                    assert.equal(url, '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
+                    assert.strictEqual(url, '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
                     done();
                 },
-                set: function() {},
-                status: function(number) {
-                    if (number >= 400) {
-                        assert.fail(number, '400', 'Failing status code', '<');
-                    }
-                },
-                send: function() {
-                    assert.fail('called send', 'called redirect', 'Incorrect routing', ', instead');
-                }
+                set: function() {}
             };
 
-            next = function() {
-                assert.fail('called next', 'called redirect', 'Incorrect routing', ', instead');
-            };
-
-            midware(req, res, next);
+            midware(req, res);
         });
 
         it('calls res.send with asset contents if the asset does exist and has its hash appended', function(done) {
@@ -199,24 +209,46 @@ describe('electricity.static', function() {
 
             res = {
                 set: function() {},
-                status: function(number) {
-                    if (number >= 400) {
-                        assert.fail(number, '400', 'Failing status code', '<');
-                    }
-                },
                 send: function(asset) {
                     fs.readFile('test/public/robots.txt', function(err, data) {
+                        assert.equal(bufCompare(data, asset), 0);
+                        done();
+                    });
+                },
+                status: function() {}
+            };
+
+            midware(req, res);
+        });
+
+        it('calls res.redirect for extension-less files', function(done) {
+            req.path = '/no-extension';
+
+            res = {
+                redirect: function(url) {
+                    assert.strictEqual(url, '/no-extension-6f5902ac237024bdd0c176cb93063dc4');
+                    done();
+                },
+                set: function() {}
+            };
+
+            midware(req, res);
+        });
+
+        it.skip('calls res.send for extension-less files', function(done) {
+            req.path = '/no-extension-6f5902ac237024bdd0c176cb93063dc4';
+
+            res = {
+                set: function() {},
+                send: function(asset) {
+                    fs.readFile('test/public/no-extension-6f5902ac237024bdd0c176cb93063dc4', function(err, data) {
                         assert.equal(bufCompare(data, asset), 0);
                         done();
                     });
                 }
             };
 
-            next = function() {
-                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-            };
-
-            midware(req,res,next);
+            midware(req, res);
         });
 
         it('calls res.send with custom headers if specified', function(done) {
@@ -889,6 +921,7 @@ describe('electricity.static', function() {
                     uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
+
                 req.path = '/styles/image_path-58c7e927b74b217b2796c4cafc3e8d27.css';
 
                 res = {
@@ -954,10 +987,11 @@ describe('electricity.static', function() {
                     uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
+
                 req.path = '/styles/sample-868c5b6f0d0cbcd87ceec825c2ac6e1f.scss';
 
                 res = {
-                    set: function(){},
+                    set: function() {},
                     status: function(number) {
                         if (number >= 400) {
                             assert.fail(number, '400', 'Failing status code', '<');
@@ -1305,7 +1339,9 @@ describe('electricity.static', function() {
                     uglifyjs: { ignore: /failure/ },
                     watch: { enabled: false }
                 });
+
                 req.path = '/styles/include_path-e7af6c89c241034f1dcff36e1709da1f.css';
+
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -1323,15 +1359,18 @@ describe('electricity.static', function() {
                         assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 minWare(req, res, next);
             });
         });
 
         describe('when hashify is set to false', function() {
             var midwareWithNoHash;
+
             before(function() {
                 midwareWithNoHash = electricity.static('test/public', {
                     hashify: false,
@@ -1340,11 +1379,11 @@ describe('electricity.static', function() {
                     uglifyjs: { enabled: false },
                     uglifycss: { enabled: false }
                 });
-
             });
 
             it('should not redirect an unhashed request', function(done) {
                 req.path = '/robots.txt';
+
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -1359,9 +1398,11 @@ describe('electricity.static', function() {
                         });
                     }
                 };
+
                 next = function() {
                     assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                 };
+
                 midwareWithNoHash(req,res,next);
             });
         });
@@ -1453,21 +1494,13 @@ describe('electricity.static', function() {
             var middleware = electricity.static('test/public');
 
             setTimeout(function() {
-                fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function(err) {
-                    if (err) {
-                        throw err;
-                    }
-
+                fs.writeFile('test/public/watchTest.txt', 'Hey look, a new asset!', function() {
                     setTimeout(function() {
                         req.path = '/watchTest-2d6adbc9b77b720b06aa3003511630c9.txt';
 
                         res = {
                             set: function() {},
-                            status: function(number) {
-                                if (number >= 400) {
-                                    assert.fail(number, '400', 'Failing status code', '<');
-                                }
-                            },
+                            status: function() {},
                             send: function(asset) {
                                 fs.readFile('test/public/watchTest.txt', function(err, data) {
                                     assert.equal(bufCompare(data, asset), 0);
@@ -1476,11 +1509,7 @@ describe('electricity.static', function() {
                             }
                         };
 
-                        next = function() {
-                            assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                        };
-
-                        middleware(req, res, next);
+                        middleware(req, res);
                     }, 1000);
                 });
             }, 1000);
@@ -1555,11 +1584,40 @@ describe('electricity.static', function() {
             });
         });
 
+        it('should handle directory renames', function(done) {
+            var middleware = electricity.static('test/public');
+
+            setTimeout(function() {
+                fse.remove('test/public/shouldHandleDirectoryRenames', function() {
+                    fse.remove('test/public/shouldHandleDirectoryRenames2', function() {
+                        fse.outputFile('test/public/shouldHandleDirectoryRenames/test.scss', 'html {}', function() {
+                            fs.rename('test/public/shouldHandleDirectoryRenames', 'test/public/shouldHandleDirectoryRenames2', function() {
+                                setTimeout(function() {
+                                    req.path = '/shouldHandleDirectoryRenames2/test.css';
+
+                                    res = {
+                                        redirect: function(url) {
+                                            assert.strictEqual(url, '/shouldHandleDirectoryRenames2/test-c1b0df53e4ec32be6e95dae8c1696440.css');
+                                            done();
+                                        },
+                                        set: function() {}
+                                    };
+
+                                    middleware(req, res);
+                                }, 1000);
+                            });
+                        });
+                    });
+                });
+            }, 1000);
+        });
+
         describe('with SASS', function() {
             it('should recompile dependents when a watched scss file changes', function(done) {
                 fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function() {
                     setTimeout(function() {
                         req.path = '/styles/include_path-9b14cc07f2e430cafc9f6661e43638db.css';
+
                         res = {
                             set: function(){},
                             status: function(number) {
@@ -1577,47 +1635,43 @@ describe('electricity.static', function() {
                                 assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
                             }
                         };
+
                         next = function() {
                             assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
                         };
+
                         midware(req, res, next);
-                    }, 10000);
+                    }, 1000);
                 });
             });
 
             it('should also recompile dependents for files added after load', function(done) {
                 var original = fs.createReadStream('test/public/styles/include_path.scss');
                 var copy = fs.createWriteStream('test/public/styles/include_path_copy.scss');
+
                 original.on('end', function() {
                     setTimeout(function() {
                         fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function() {
-                        setTimeout(function() {
-                            req.path = '/styles/include_path_copy-757ae8512d2a003fe6079c7a7216f8e9.css';
-                            res = {
-                                set: function(){},
-                                status: function(number) {
-                                    if (number >= 400) {
-                                        assert.fail(number, '400', 'Failing status code', '<');
-                                    }
-                                },
-                                send: function(asset) {
-                                    fs.readFile('test/public/styles/compiled/include_path.css', function(err, data) {
-                                        assert.equal(data.toString(), asset);
-                                        done();
-                                    });
-                                },
-                                redirect: function(url) {
-                                    assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
-                                }
-                            };
-                            next = function() {
-                                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-                            };
-                            midware(req, res, next);
-                        }, 10000);
-                    });
-                }, 10000);
+                            setTimeout(function() {
+                                req.path = '/styles/include_path_copy-757ae8512d2a003fe6079c7a7216f8e9.css';
+
+                                res = {
+                                    send: function(asset) {
+                                        fs.readFile('test/public/styles/compiled/include_path.css', function(err, data) {
+                                            assert.equal(data.toString(), asset);
+                                            done();
+                                        });
+                                    },
+                                    set: function() {},
+                                    status: function() {}
+                                };
+
+                                midware(req, res);
+                            }, 1000);
+                        });
+                    }, 1000);
                 });
+
                 original.pipe(copy);
             });
 

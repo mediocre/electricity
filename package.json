@@ -14,6 +14,7 @@
   "devDependencies": {
     "buffer-compare": "*",
     "coveralls": "*",
+    "fs-extra": "*",
     "istanbul": "*",
     "mocha": "3.x"
   },
