@@ -4,7 +4,7 @@
     "chokidar": "1.7.x",
     "mime": "2.0.x",
     "negotiator": "0.6.x",
-    "node-sass": "4.5.x",
+    "node-sass": "4.6.x",
     "react-tools": "0.13.x",
     "sass-graph": "2.2.x",
     "snockets": "1.3.x",
@@ -34,5 +34,5 @@
     "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec -t 21000 && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test": "mocha -R spec -t 21000"
   },
-  "version": "2.1.0"
+  "version": "2.1.1"
 }
