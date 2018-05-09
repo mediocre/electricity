@@ -9,7 +9,7 @@ Electricity follows a number of best practices for making web pages fast.
 The built-in Express middleware for serving static files is great if you need basic support for serving static files.
 But if you want to follow [Best Practices for Speeding Up Your Web Site](http://developer.yahoo.com/performance/rules.html) you need something that can concat, gzip, and minify your static files. Electricity does all this and more without the need to create a complicated build process using Grunt or a similar build tool.
 
-##Basic Usage
+## Basic Usage
 
 Typically, in an Express app you'd serve static files using the built-in middleware. Like this:
 
@@ -28,7 +28,7 @@ var electricity = require('electricity');
 app.use(electricity.static(__dirname + '/public'));
 ```
 
-##View Helper
+## View Helper
 
 A common best practice for serving static files is to set a far future `Expires` header: http://developer.yahoo.com/performance/rules.html#expires
 
@@ -51,7 +51,7 @@ Which ultimately gets rendered as something like this:
 <script src="/scripts/script-2fcab58712467eab.js"></script>
 ```
 
-##Features
+## Features
 
 Electricity comes with a variety of features to help make your web pages fast without the need to setup a complicated build process.
 
@@ -64,7 +64,7 @@ Electricity comes with a variety of features to help make your web pages fast wi
 - **CDN Hostname:** If you're using a CDN (Content Delivery Network) that supports a custom origin (like Amazon CloudFront) you can specify the hostname you'd like Electricity to use when generating URLs.
 - **Watch:** Electricity watches for changes to your static files and automatically serves the latest content without the need to restart your web server (useful during development). Electricity also understands Sass and Snockets dependency graphs to ensure the parent file contents are updated if a child file has been modified.
 
-##Advanced Usage
+## Advanced Usage
 
 Default options look like this:
 
@@ -119,7 +119,7 @@ Pass options to the middleware like this:
 app.use(electricity.static(__dirname + '/public', options));
 ```
 
-##HTTP Headers
+## HTTP Headers
 
 Electricity sets proper `Cache-Control`, `ETag`, `Expires`, and `Last-Modified` headers to help avoid unnecessary HTTP requests on subsequent page views. If you'd like to specify literal values for specific HTTP headers you can set them in the `headers` option. This is useful if you need to specify a `Access-Control-Allow-Origin` header when loading fonts or JSON data off a CDN.
 
@@ -129,7 +129,7 @@ app.use(electricity.static(__dirname + '/public', {
 }));
 ```
 
-##CSS URI Values
+## CSS URI Values
 
 Electricity will automatically rewrite URIs in CSS to use MD5 hashes (if a matching file is found). For example:
 
@@ -143,7 +143,7 @@ becomes this to allow caching and avoid unnecessary redirects:
 background-image: url(/apple-touch-icon-precomposed-d131dd02c5e6eec4.png);
 ```
 
-##CDN Hostname
+## CDN Hostname
 
 If you specify a hostname like this:
 ```javascript
