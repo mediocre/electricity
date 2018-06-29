@@ -748,10 +748,10 @@ describe('electricity.static', function() {
             });
 
             it('serves compiled SASS files', function(done) {
-                req.path = '/styles/sample-da39c76491d47b99ab3c1bb3aa56f653.css';
+                req.path = '/styles/sample-4d8249529cea736beb1104f82b65b904.css';
 
                 res = {
-                    set: function(){},
+                    set: function() {},
                     status: function(number) {
                         if (number >= 400) {
                             assert.fail(number, '400', 'Failing status code', '<');
@@ -773,10 +773,10 @@ describe('electricity.static', function() {
             });
 
             it('correctly resolves imports', function(done) {
-                req.path = '/styles/include_path-757ae8512d2a003fe6079c7a7216f8e9.css';
+                req.path = '/styles/include_path-86eb0c7c324581dd9bff9832438282fd.css';
 
                 res = {
-                    set: function(){},
+                    set: function() {},
                     status: function(number) {
                         if (number >= 400) {
                             assert.fail(number, '400', 'Failing status code', '<');
@@ -816,7 +816,7 @@ describe('electricity.static', function() {
                                     },
                                     send: function(asset) {
                                         fs.readFile('test/public/styles/compiled/image_path.css', function(err, data) {
-                                            assert.fail(data.toString(), asset, 'Redirect triggered');
+                                            assert.strictEqual(data.toString(), asset);
                                             done();
                                         });
                                     }
@@ -1616,7 +1616,7 @@ describe('electricity.static', function() {
             it('should recompile dependents when a watched scss file changes', function(done) {
                 fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function() {
                     setTimeout(function() {
-                        req.path = '/styles/include_path-9b14cc07f2e430cafc9f6661e43638db.css';
+                        req.path = '/styles/include_path-42076d4b87dddb9db5b5bc11be656c03.css';
 
                         res = {
                             set: function(){},
@@ -1653,7 +1653,7 @@ describe('electricity.static', function() {
                     setTimeout(function() {
                         fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function() {
                             setTimeout(function() {
-                                req.path = '/styles/include_path_copy-757ae8512d2a003fe6079c7a7216f8e9.css';
+                                req.path = '/styles/include_path_copy-86eb0c7c324581dd9bff9832438282fd.css';
 
                                 res = {
                                     send: function(asset) {
