@@ -641,73 +641,6 @@ describe('electricity.static', function() {
             midware(req,res,next);
         });
 
-        function gzipTest(done) {
-            req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
-            req.get = function(header) {
-                if (header == 'Accept-Encoding') {
-                    return 'gzip, deflate';
-                }
-            };
-            req.headers['accept-encoding'] = 'gzip, deflate';
-            var headerSet = false;
-            res = {
-                set: function(headers){
-                    if (headers['Content-Encoding'] === 'gzip') {
-                        headerSet = true;
-                    }
-                },
-                status: function(number) {
-                    if (number >= 400) {
-                        assert.fail(number, '400', 'Failing status code', '<');
-                    }
-                },
-                send: function(asset) {
-                    fs.readFile('test/public/robots.txt', function(err, data) {
-                        zlib.gzip(data, function(err, zippedAsset) {
-                            assert.equal(bufCompare(zippedAsset, asset), 0);
-                            assert(headerSet, 'Headers not set correctly');
-                            done();
-                        });
-                    });
-                }
-            };
-            next = function() {
-                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-            };
-            midware(req,res,next);
-        }
-
-        it('should gzip the asset contents and send correct encoding header if the client accepts it', gzipTest);
-
-        it('should still send gzipped contents after gzipped content is cached', gzipTest);
-
-        it('should not gzip non-whitelisted MIME types', function(done) {
-            req.path = '/apple-touch-icon-precomposed-ed47dd1fd0256fec0480adc1c03f9ef3.png';
-            req.get = function(header) {
-                if (header == 'Accept-Encoding') {
-                    return 'gzip, deflate';
-                }
-            };
-            res = {
-                set: function(){},
-                status: function(number) {
-                    if (number >= 400) {
-                        assert.fail(number, '400', 'Failing status code', '<');
-                    }
-                },
-                send: function(asset) {
-                    fs.readFile('test/public/apple-touch-icon-precomposed.png', function(err, data) {
-                        assert.equal(bufCompare(data, asset), 0);
-                        done();
-                    });
-                }
-            };
-            next = function() {
-                assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
-            };
-            midware(req,res,next);
-        });
-
         it('registers an EJS helper', function(done) {
             req.app = {
                 locals: {}
@@ -736,6 +669,112 @@ describe('electricity.static', function() {
             });
         });
 
+        describe('Gzip', function() {
+            function gzipTest(done) {
+                req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
+
+                req.get = function(header) {
+                    if (header == 'Accept-Encoding') {
+                        return 'gzip, deflate';
+                    }
+                };
+
+                req.headers['accept-encoding'] = 'gzip, deflate';
+
+                var headerSet = false;
+
+                res = {
+                    set: function(headers){
+                        if (headers['Content-Encoding'] === 'gzip') {
+                            headerSet = true;
+                        }
+                    },
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/robots.txt', function(err, data) {
+                            zlib.gzip(data, function(err, zippedAsset) {
+                                assert.equal(bufCompare(zippedAsset, asset), 0);
+                                assert(headerSet, 'Headers not set correctly');
+                                done();
+                            });
+                        });
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                midware(req,res,next);
+            }
+
+            it('should gzip the asset contents and send correct encoding header if the client accepts it', gzipTest);
+
+            it('should still send gzipped contents after gzipped content is cached', gzipTest);
+
+            it('should not gzip non-whitelisted MIME types', function(done) {
+                req.path = '/apple-touch-icon-precomposed-ed47dd1fd0256fec0480adc1c03f9ef3.png';
+                req.get = function(header) {
+                    if (header == 'Accept-Encoding') {
+                        return 'gzip, deflate';
+                    }
+                };
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/apple-touch-icon-precomposed.png', function(err, data) {
+                            assert.equal(bufCompare(data, asset), 0);
+                            done();
+                        });
+                    }
+                };
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+                midware(req,res,next);
+            });
+
+            it('should gzip blank file', function(done) {
+                req.path = '/blank-d41d8cd98f00b204e9800998ecf8427e.txt';
+
+                req.get = function(header) {
+                    if (header === 'Accept-Encoding') {
+                        return 'gzip, deflate';
+                    }
+                };
+
+                res = {
+                    set: function() {},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/blank.txt', function(err, data) {
+                            assert.equal(bufCompare(data, asset), 0);
+                            done();
+                        });
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                midware(req,res,next);
+            });
+        });
+
         describe('SASS support', function() {
             before(function(done) {
                 fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function(err) {
@@ -748,10 +787,10 @@ describe('electricity.static', function() {
             });
 
             it('serves compiled SASS files', function(done) {
-                req.path = '/styles/sample-da39c76491d47b99ab3c1bb3aa56f653.css';
+                req.path = '/styles/sample-4d8249529cea736beb1104f82b65b904.css';
 
                 res = {
-                    set: function(){},
+                    set: function() {},
                     status: function(number) {
                         if (number >= 400) {
                             assert.fail(number, '400', 'Failing status code', '<');
@@ -773,10 +812,10 @@ describe('electricity.static', function() {
             });
 
             it('correctly resolves imports', function(done) {
-                req.path = '/styles/include_path-757ae8512d2a003fe6079c7a7216f8e9.css';
+                req.path = '/styles/include_path-86eb0c7c324581dd9bff9832438282fd.css';
 
                 res = {
-                    set: function(){},
+                    set: function() {},
                     status: function(number) {
                         if (number >= 400) {
                             assert.fail(number, '400', 'Failing status code', '<');
@@ -816,7 +855,7 @@ describe('electricity.static', function() {
                                     },
                                     send: function(asset) {
                                         fs.readFile('test/public/styles/compiled/image_path.css', function(err, data) {
-                                            assert.fail(data.toString(), asset, 'Redirect triggered');
+                                            assert.strictEqual(data.toString(), asset);
                                             done();
                                         });
                                     }
@@ -1616,7 +1655,7 @@ describe('electricity.static', function() {
             it('should recompile dependents when a watched scss file changes', function(done) {
                 fs.writeFile('test/public/styles/lib/vars.scss', '$color: blue;', function() {
                     setTimeout(function() {
-                        req.path = '/styles/include_path-9b14cc07f2e430cafc9f6661e43638db.css';
+                        req.path = '/styles/include_path-42076d4b87dddb9db5b5bc11be656c03.css';
 
                         res = {
                             set: function(){},
@@ -1653,7 +1692,7 @@ describe('electricity.static', function() {
                     setTimeout(function() {
                         fs.writeFile('test/public/styles/lib/vars.scss', '$color: red;', function() {
                             setTimeout(function() {
-                                req.path = '/styles/include_path_copy-757ae8512d2a003fe6079c7a7216f8e9.css';
+                                req.path = '/styles/include_path_copy-86eb0c7c324581dd9bff9832438282fd.css';
 
                                 res = {
                                     send: function(asset) {
