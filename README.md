@@ -104,7 +104,7 @@ var options = {
     snockets: { // Object passed straight to snockets options
         ignore: ['raw', /donotcompile/] // Files to skip compilation on, can be a single argument to String.prototype.match or an array
     },
-    uglifyjs: { // Object passed straight to uglify-js options
+    uglifyjs: { // Object passed straight to uglify-es options
         enabled: true // Minify Javascript
     },
     uglifycss: { // Object passed straight to uglifycss options
