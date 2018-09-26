@@ -1333,6 +1333,47 @@ describe('electricity.static', function() {
                 };
                 minWare(req, res, next);
             });
+
+            it('should support sourcemaps', function(done) {
+                var minWare = electricity.static('test/public', {
+                    snockets: { ignore: 'compiled' },
+                    uglifyjs: {
+                        compress: {
+                            sequences: false
+                        },
+                        enabled: true,
+                        ignore: /failure/,
+                        sourceMap: true
+                    },
+                    watch: { enabled: false }
+                });
+
+                req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
+
+                res = {
+                    set: function(){},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/compiled/main.min.js', function(err, data) {
+                            assert.equal(data.toString(), asset.toString());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                minWare(req, res, next);
+            });
         });
 
         describe('uglifycss support', function() {
