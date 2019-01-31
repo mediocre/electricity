@@ -1,0 +1,3 @@
+.eslint*
+.travis.yml
+test
