@@ -1054,7 +1054,7 @@ describe('electricity.static', function() {
 
         describe('snockets support', function() {
             it('should serve Javascript with required files included', function(done) {
-                req.path = '/scripts/main-c6c2afd452d98199939fb7c292c5474b.js';
+                req.path = '/scripts/main-a46b904a86d542343e309d612d071a8f.js';
 
                 res = {
                     set: function() {},
@@ -1088,7 +1088,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
+                req.path = '/scripts/main-f24933d8477f8333257c5ea4a9311702.js';
 
                 res = {
                     set: function() {},
@@ -1122,7 +1122,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/scripts/main-6bcab6c9a87f02ef40018f3302d1e918.js';
+                req.path = '/scripts/main-f24933d8477f8333257c5ea4a9311702.js';
 
                 res = {
                     set: function() {},
@@ -1159,7 +1159,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/jsx/reactTest-185406c31a8edd01ff39d5ba7506513f.js';
+                req.path = '/jsx/reactTest-a3fffb0217da1b275894afc070387caf.js';
 
                 res = {
                     set: function() {},
@@ -1194,7 +1194,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/jsx/reactSnockets-a0df1fd0ccebc9227d2afe96bfd71645.js';
+                req.path = '/jsx/reactSnockets-fb0ea2f35186a2bd242fadf567a7b9c3.js';
 
                 res = {
                     set: function() {},
@@ -1229,7 +1229,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/jsx/reactSnockets-672b7d0ee298f0668d4ca6372262bc43.js';
+                req.path = '/jsx/reactSnockets-1cf4b348ea36da51e00c77dfe37dabe5.js';
 
                 res = {
                     set: function(){},
@@ -1272,7 +1272,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
+                req.path = '/scripts/main-33609ed384f9989b278900b3ac3edbaa.js';
 
                 res = {
                     set: function(){},
@@ -1310,7 +1310,7 @@ describe('electricity.static', function() {
                     },
                     watch: { enabled: false }
                 });
-                req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
+                req.path = '/scripts/main-33609ed384f9989b278900b3ac3edbaa.js';
                 res = {
                     set: function(){},
                     status: function(number) {
@@ -1348,7 +1348,7 @@ describe('electricity.static', function() {
                     watch: { enabled: false }
                 });
 
-                req.path = '/scripts/main-1c84b0a70d32006b11e279660af525be.js';
+                req.path = '/scripts/main-33609ed384f9989b278900b3ac3edbaa.js';
 
                 res = {
                     set: function(){},
@@ -1770,7 +1770,7 @@ describe('electricity.static', function() {
             it('should recompile dependents when a watched js file changes', function(done) {
                 fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1.1\');\n', function() {
                     setTimeout(function() {
-                        req.path = '/scripts/main-8ebef9643de3549f70271ec51a402b26.js';
+                        req.path = '/scripts/main-a4e99c1cd642c44dc223a612469823c7.js';
 
                         res = {
                             set: function() {},
@@ -1812,7 +1812,7 @@ describe('electricity.static', function() {
                         setTimeout(function() {
                             fs.writeFile('test/public/scripts/dep1.js', 'console.log(\'dep1\');\n', function() {
                                 setTimeout(function() {
-                                    req.path = '/scripts/main2-c6c2afd452d98199939fb7c292c5474b.js';
+                                    req.path = '/scripts/main2-a46b904a86d542343e309d612d071a8f.js';
 
                                     res = {
                                         set: function() {},

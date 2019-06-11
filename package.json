@@ -1,6 +1,7 @@
 {
   "description": "An alternative to the built-in Express middleware for serving static files. Electricity follows a number of best practices for making web pages fast.",
   "dependencies": {
+    "@babel/preset-env": "^7.4.5",
     "chokidar": "~3.0.0",
     "mime": "~2.4.0",
     "negotiator": "0.6.x",
@@ -12,6 +13,18 @@
     "uglifycss": "0.0.x"
   },
   "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.4.4",
+    "@babel/plugin-transform-react-constant-elements": "^7.2.0",
+    "@babel/plugin-transform-react-display-name": "^7.2.0",
+    "@babel/plugin-transform-react-inline-elements": "^7.2.0",
+    "@babel/plugin-transform-react-jsx": "^7.3.0",
+    "@babel/plugin-transform-react-jsx-compat": "^7.2.0",
+    "@babel/plugin-transform-react-jsx-self": "^7.2.0",
+    "@babel/plugin-transform-react-jsx-source": "^7.2.0",
+    "@babel/preset-react": "^7.0.0",
     "buffer-compare": "*",
     "coveralls": "*",
     "fs-extra": "*",
