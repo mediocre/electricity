@@ -1450,7 +1450,7 @@ describe('electricity.static', function() {
 
         describe.only('webpack support', function() {
             it('should bundle modules with import syntax', function(done) {
-                req.path = '/scripts/webpack/relative-import-c6c2afd452d98199939fb7c292c5474b.js';
+                req.path = '/scripts/webpack/relative-import-ab1fef46bbd55b561f9f8d2338cfd79c.js';
 
                 res = {
                     set: function() {},
@@ -1479,7 +1479,7 @@ describe('electricity.static', function() {
             });
 
             it('should bundle modules with require syntax', function(done) {
-                req.path = '/scripts/webpack/relative-require-c6c2afd452d98199939fb7c292c5474b.js';
+                req.path = '/scripts/webpack/relative-require-be604e2e03521b69c3652b4ec245acfb.js';
 
                 res = {
                     set: function() {},
