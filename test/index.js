@@ -1448,6 +1448,65 @@ describe('electricity.static', function() {
             });
         });
 
+        describe.only('webpack support', function() {
+            it('should bundle modules with import syntax', function(done) {
+                req.path = '/scripts/webpack/relative-import-c6c2afd452d98199939fb7c292c5474b.js';
+
+                res = {
+                    set: function() {},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/compiled/webpack/relative-import.js', function(err, data) {
+                            console.log(asset.trim(), data.toString().trim());
+                            assert.equal(asset.trim(), data.toString().trim());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                midware(req, res, next);
+            });
+
+            it('should bundle modules with require syntax', function(done) {
+                req.path = '/scripts/webpack/relative-require-c6c2afd452d98199939fb7c292c5474b.js';
+
+                res = {
+                    set: function() {},
+                    status: function(number) {
+                        if (number >= 400) {
+                            assert.fail(number, '400', 'Failing status code', '<');
+                        }
+                    },
+                    send: function(asset) {
+                        fs.readFile('test/public/scripts/compiled/webpack/relative-require.js', function(err, data) {
+                            assert.equal(asset.trim(), data.toString().trim());
+                            done();
+                        });
+                    },
+                    redirect: function(url) {
+                        assert.fail('called redirect to ' + url, 'called send', 'Incorrect routing', ', instead');
+                    }
+                };
+
+                next = function() {
+                    assert.fail('called next', 'called send', 'Incorrect routing', ', instead');
+                };
+
+                midware(req, res, next);
+            });
+        });
+
         describe('when hashify is set to false', function() {
             var midwareWithNoHash;
 
