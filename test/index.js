@@ -1450,7 +1450,7 @@ describe('electricity.static', function() {
 
         describe.only('webpack support', function() {
             it('should bundle modules with import syntax', function(done) {
-                req.path = '/scripts/webpack/relative-import-ab1fef46bbd55b561f9f8d2338cfd79c.js';
+                req.path = '/scripts/webpack/relative-import-29df01ce7e6ba5219e1b45ec71340362.js';
 
                 res = {
                     set: function() {},
@@ -1461,7 +1461,7 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/scripts/compiled/webpack/relative-import.js', function(err, data) {
-                            console.log(asset.trim(), data.toString().trim());
+                            // console.log(asset.trim(), data.toString().trim());
                             assert.equal(asset.trim(), data.toString().trim());
                             done();
                         });
