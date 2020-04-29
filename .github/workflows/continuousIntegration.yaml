@@ -1,0 +1,48 @@
+name: build
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10, 12.13.0, 13]
+    
+    steps:
+    - name: Setup Node ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Checkout from Git
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        ssh-key: ${{ secrets.MERCATALYST_DEPLOY_KEY }}
+
+    - name: Install ESLint and Mocha
+      run: npm install -g eslint mocha
+
+    - name: Run ESLint
+      run: eslint .
+
+    - name: Run npm install
+      run: npm install
+
+    - name: Run tests and coverage report
+      run: npm run coveralls
+
+    - name: Notify Slack
+      if: always()
+      uses: homoluctus/slatify@master
+      with:
+        type: ${{ job.status }}
+        job_name: '${{ github.repository }} - Tests '
+        channel: '#development'
+        url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        commit: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        icon_emoji: ':mediocrebot:'
+        username: 'mediocrebot'
