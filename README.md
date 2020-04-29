@@ -1,6 +1,6 @@
 # Electricity
 
-[![Build Status](https://travis-ci.org/mediocre/electricity.svg?branch=master)](https://travis-ci.org/mediocre/electricity)
+[![Build Status](https://github.com/mediocre/electricity/workflows/build/badge.svg)](https://github.com/mediocre/electricity/actions?query=workflow%3Abuild)
 [![Coverage Status](https://coveralls.io/repos/github/mediocre/electricity/badge.svg?branch=master)](https://coveralls.io/github/mediocre/electricity?branch=master)
 
 An alternative to the built-in Express middleware for serving static files.
