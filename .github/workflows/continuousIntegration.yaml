@@ -43,6 +43,15 @@ jobs:
       with:
         node-version: 12.13.0
 
+    - name: Checkout from Git
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        ssh-key: ${{ secrets.MERCATALYST_DEPLOY_KEY }}
+
+    - name: Run npm install
+      run: npm install
+
     - name: Run coverage report
       run: npm run coveralls
       env:
@@ -50,11 +59,11 @@ jobs:
 
   notify:
     needs: [test, coverage]
+    if: always()
     runs-on: ubuntu-latest
 
     steps:
     - name: Notify Slack
-      if: always()
       uses: homoluctus/slatify@master
       with:
         type: ${{ job.status }}
