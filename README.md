@@ -170,5 +170,3 @@ Your HTML will ultimately get rendered using protocol-relative URLs like this:
 <link href="//cdn.example.com/styles/style-693d9a0698aff95c.css" rel="stylesheet" />
 <script src="//cdn.example.com/scripts/script-2fcab58712467eab.js"></script>
 ```
-
-[![Build Status](https://travis-ci.org/mediocre/electricity.svg?branch=master)](https://travis-ci.org/mediocre/electricity)
