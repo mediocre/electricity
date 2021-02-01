@@ -68,7 +68,7 @@ jobs:
 
     - name: Run without coverage report
       run: |-
-        if [ "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
+        if [ ! "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
         then
           npm test
         else
