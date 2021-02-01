@@ -9,6 +9,9 @@ jobs:
     strategy:
       matrix:
         node-version: [12.19.0, 14.15.0]
+
+    env:
+      DO_COVERALLS: 14.15.0
     
     steps:
     - name: Setup Node ${{ matrix.node-version }}
@@ -53,7 +56,24 @@ jobs:
       run: npm install
 
     - name: Run coverage report
-      run: npm run coveralls
+      run: |-
+        if [ "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
+        then
+          npm run coveralls
+        else
+          true
+        fi
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+    - name: Run without coverage report
+      run: |-
+        if [ "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
+        then
+          npm test
+        else
+          true
+        fi
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
@@ -68,7 +88,7 @@ jobs:
       with:
         type: ${{ job.status }}
         job_name: '${{ github.repository }} - Tests '
-        channel: '#development'
+        channel: '#electricity'
         url: ${{ secrets.SLACK_WEBHOOK_URL }}
         commit: true
         token: ${{ secrets.GITHUB_TOKEN }}
