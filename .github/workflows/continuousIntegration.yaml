@@ -31,6 +31,9 @@ jobs:
     - name: Run ESLint
       run: eslint .
 
+    - name: run npm install
+      run: npm install
+
     - name: Run coverage report
       run: |-
         if [ "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
