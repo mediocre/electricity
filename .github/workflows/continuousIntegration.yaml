@@ -53,16 +53,16 @@ jobs:
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-  notify:
-    needs: [test]
+
+  notify_slack:
     if: always()
     runs-on: ubuntu-latest
-
+    needs: test
     steps:
     - name: Notify Slack
       uses: homoluctus/slatify@master
       with:
-        type: ${{ job.status }}
+        type: ${{ needs.test.result }}
         job_name: '${{ github.repository }} - Tests '
         channel: '#electricity'
         url: ${{ secrets.SLACK_WEBHOOK_URL }}
