@@ -31,30 +31,6 @@ jobs:
     - name: Run ESLint
       run: eslint .
 
-    - name: Run npm install
-      run: npm install
-
-    - name: Run tests
-      run: npm test
-
-  coverage:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Setup Node 12.13.0
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.13.0
-
-    - name: Checkout from Git
-      uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-        ssh-key: ${{ secrets.MERCATALYST_DEPLOY_KEY }}
-
-    - name: Run npm install
-      run: npm install
-
     - name: Run coverage report
       run: |-
         if [ "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
