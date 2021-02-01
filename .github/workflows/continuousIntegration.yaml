@@ -54,7 +54,7 @@ jobs:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
   notify:
-    needs: [test, coverage]
+    needs: [test]
     if: always()
     runs-on: ubuntu-latest
 
