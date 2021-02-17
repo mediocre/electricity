@@ -15,8 +15,8 @@
     "buffer-compare": "*",
     "coveralls": "*",
     "fs-extra": "*",
-    "nyc": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "nyc": "*"
   },
   "keywords": [
     "asset",
