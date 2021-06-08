@@ -1,7 +1,7 @@
 # Electricity
 
 [![Build Status](https://github.com/mediocre/electricity/workflows/build/badge.svg)](https://github.com/mediocre/electricity/actions?query=workflow%3Abuild)
-[![Coverage Status](https://coveralls.io/repos/github/mediocre/electricity/badge.svg?branch=master)](https://coveralls.io/github/mediocre/electricity?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/mediocre/electricity/badge.svg?branch=main)](https://coveralls.io/github/mediocre/electricity?branch=main)
 
 An alternative to the built-in Express middleware for serving static files.
 Electricity follows a number of best practices for making web pages fast.
