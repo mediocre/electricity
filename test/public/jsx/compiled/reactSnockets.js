@@ -1,11 +1,8 @@
-var Include = React.createClass({displayName: "Include",
-    render: function() {
-        return (
-            React.createElement("h1", null, "This got included!")
-        );
-    }
-});
+var Include = React.createClass({
+  displayName: "Include",
+  render: function () {
+    return /*#__PURE__*/React.createElement("h1", null, "This got included!");
+  }
+}); //= require reactInclude.js
 
-//= require reactInclude.js
-
-React.render(React.createElement(Include, null), document.body);
+React.render( /*#__PURE__*/React.createElement(Include, null), document.body);
