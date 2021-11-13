@@ -1,4 +1,5 @@
 const assert = require('assert');
+const crypto = require('crypto');
 const fs = require('fs');
 const zlib = require('zlib');
 
@@ -39,7 +40,7 @@ function setupPassthrough() {
     };
 }
 
-describe('electricity.static', function() {
+describe.skip('electricity.static', function() {
     before(function(done) {
         midware = electricity.static('test/public', {
             sass: { imagePath: '/images/' },
@@ -55,36 +56,6 @@ describe('electricity.static', function() {
     beforeEach(function(done) {
         setupPassthrough();
         setImmediate(done);
-    });
-
-    it('returns a function', function(done) {
-        assert.equal(typeof midware, 'function');
-
-        done();
-    });
-
-    it('should default to "public" if the directory isn’t specified', function(done) {
-        assert.throws(function() {
-            electricity.static();
-        }, /public/);
-
-        done();
-    });
-
-    it('should throw if the directory does not exist', function(done) {
-        assert.throws(function() {
-            electricity.static('test/nope');
-        });
-
-        done();
-    });
-
-    it('should throw if the directory is a file', function(done) {
-        assert.throws(function() {
-            electricity.static('package.json');
-        });
-
-        done();
     });
 
     describe('with options', function() {
@@ -180,30 +151,6 @@ describe('electricity.static', function() {
     });
 
     describe('The middleware', function() {
-        it('calls next if the asset does not exist', function(done) {
-            midware(req, res, done);
-        });
-
-        it('calls next if the request method is not GET or HEAD', function(done) {
-            req.method = 'POST';
-
-            midware(req, res, done);
-        });
-
-        it('calls res.redirect to the hash-appeneded url if the asset does exist', function(done) {
-            req.path = '/robots.txt';
-
-            res = {
-                redirect: function(url) {
-                    assert.strictEqual(url, '/robots-ca121b5d03245bf82db00d14cee04e22.txt');
-                    done();
-                },
-                set: function() {}
-            };
-
-            midware(req, res);
-        });
-
         it('calls res.send with asset contents if the asset does exist and has its hash appended', function(done) {
             req.path = '/robots-ca121b5d03245bf82db00d14cee04e22.txt';
 
@@ -1205,7 +1152,6 @@ describe('electricity.static', function() {
                     },
                     send: function(asset) {
                         fs.readFile('test/public/jsx/compiled/reactSnockets.js', function(err, data) {
-                            console.log(asset.trim());
                             assert.equal(asset.trim(), data.toString().trim());
                             done();
                         });
@@ -1855,6 +1801,461 @@ describe('electricity.static', function() {
 
                     done();
                 });
+            });
+        });
+    });
+});
+
+describe('electricity.static', function() {
+    it('should default to "public" if a directory isn’t specified', function(done) {
+        const middleware = electricity.static();
+
+        const req = {
+            method: 'GET',
+            path: '/robots.txt'
+        };
+
+        const next = function() {
+            done();
+        };
+
+        middleware(req, null, next);
+    });
+
+    it('should return a function', function() {
+        const middleware = electricity.static('test/public');
+        assert.strictEqual(typeof middleware, 'function');
+    });
+
+    it('should call next middleware when the specified file can not be found', function(done) {
+        const middleware = electricity.static('test/public');
+
+        const req = {
+            method: 'GET',
+            path: '/not-found.txt'
+        };
+
+        const next = function(err) {
+            assert.ifError(err);
+            done();
+        };
+
+        middleware(req, null, next);
+    });
+
+    it('should call next middleware when the specified URL is a directory', function(done) {
+        const middleware = electricity.static('test/public');
+
+        const req = {
+            method: 'GET',
+            path: '/scripts'
+        };
+
+        const next = function(err) {
+            assert.ifError(err);
+            done();
+        };
+
+        middleware(req, null, next);
+    });
+
+    it('should call next middleware with an error if the specified URL is too long', function(done) {
+        const middleware = electricity.static('test/public');
+
+        const req = {
+            method: 'GET',
+            path: crypto.randomBytes(256).toString('hex')
+        };
+
+        const next = function(err) {
+            assert(err);
+            done();
+        };
+
+        middleware(req, null, next);
+    });
+
+    describe('gzip', function() {
+        it('should gzip TXT files for clients that accept gzip', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                get: function() {},
+                headers: {
+                    'accept-encoding': 'gzip, deflate'
+                },
+                method: 'GET',
+                path: '/lorem-ipsum-1866425c51a663f0e9c1b8214c2ba186f6c827e4.txt'
+            };
+
+            const res = {
+                send: function() {},
+                set: function(field, value) {
+                    if (field === 'content-encoding' && value === 'gzip') {
+                        done();
+                    }
+                }
+            };
+
+            middleware(req, res);
+        });
+
+        it('should not gzip TXT files for clients that do not accept gzip', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                get: function() {},
+                headers: {},
+                method: 'GET',
+                path: '/lorem-ipsum-1866425c51a663f0e9c1b8214c2ba186f6c827e4.txt'
+            };
+
+            const res = {
+                send: function() {
+                    done();
+                },
+                set: function(field, value) {
+                    if (field === 'content-encoding' && value === 'gzip') {
+                        assert.fail();
+                    }
+                }
+            };
+
+            middleware(req, res);
+        });
+
+        it('should not gzip PNG files', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                get: function() {},
+                method: 'GET',
+                path: '/apple-touch-icon-precomposed-217316d510b3122f64bd75f2dc0dcdba6c4786d5.png'
+            };
+
+            const res = {
+                send: function() {
+                    done();
+                },
+                set: function(field, value) {
+                    if (field === 'content-encoding' && value === 'gzip') {
+                        assert.fail();
+                    }
+                }
+            };
+
+            middleware(req, res);
+        });
+    });
+
+    describe('hashify', function() {
+        it('should hashify by default', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'GET',
+                path: '/robots.txt'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/robots.txt', function(err, expected) {
+                                assert(Buffer.compare(body, expected) === 0);
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+
+        it('should not hashify if disabled', function(done) {
+            const middleware = electricity.static('test/public', {
+                hashify: false
+            });
+
+            const req = {
+                get: function() {},
+                method: 'GET',
+                path: '/robots.txt'
+            };
+
+            const res = {
+                set: function() {},
+                status: function(code) {
+                    assert.strictEqual(code, 200);
+                },
+                send: function(body) {
+                    fs.readFile('test/public/robots.txt', function(err, expected) {
+                        assert(Buffer.compare(body, expected) === 0);
+                        done();
+                    });
+                }
+            };
+
+            middleware(req, res);
+        });
+
+        it('should not hashify if enabled', function(done) {
+            const middleware = electricity.static('test/public', {
+                hashify: true
+            });
+
+            const req = {
+                method: 'GET',
+                path: '/robots.txt'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt');
+                    done();
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+
+        it('should hashify files without extensions', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'GET',
+                path: '/no-extension'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/no-extension-22596363b3de40b06f981fb85d82312e8c0ed511');
+                    done();
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+    });
+
+    describe('HTTP headers', function() {
+        it('should allow additional HTTP headers', function(done) {
+            const middleware = electricity.static('test/public', {
+                headers: {
+                    'access-control-allow-origin': 'https://example.com'
+                }
+            });
+
+            const req = {
+                get: function() {},
+                method: 'GET',
+                path: '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt'
+            };
+
+            const res = {
+                send: function() {},
+                set: function(value) {
+                    if (value['access-control-allow-origin'] === 'https://example.com') {
+                        done();
+                    }
+                }
+            };
+
+            middleware(req, res);
+        });
+
+        it('should return a 304 for a valid if-none-match header', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                get: function(field) {
+                    if (field === 'if-none-match') {
+                        return '"423251d722a53966eb9368c65bfd14b39649105d"';
+                    }
+                },
+                method: 'GET',
+                path: '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt'
+            };
+
+            const res = {
+                set: function() {},
+                sendStatus: function(code) {
+                    assert.strictEqual(code, 304);
+                    done();
+                }
+            };
+
+            middleware(req, res);
+        });
+
+        it('should return etag header for invalid if-none-match header', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                get: function(field) {
+                    if (field === 'if-none-match') {
+                        return '"invalid"';
+                    }
+                },
+                method: 'GET',
+                path: '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt'
+            };
+
+            const res = {
+                set: function(headers) {
+                    if (headers.etag === '423251d722a53966eb9368c65bfd14b39649105d') {
+                        done();
+                    }
+                },
+                send: function() {}
+            };
+
+            middleware(req, res);
+        });
+    });
+
+    describe('HTTP methods', function() {
+        it('should handle HEAD requests', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                get: function() {},
+                method: 'HEAD',
+                path: '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt'
+            };
+
+            const res = {
+                sendStatus: function(code) {
+                    assert.strictEqual(code, 200);
+                    done();
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+
+        it('should not handle POST requests', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'POST',
+                path: '/robots.txt'
+            };
+
+            const next = function() {
+                done();
+            };
+
+            middleware(req, null, next);
+        });
+    });
+
+    describe('snockets', function() {
+        it('should concatenate files', function(done) {
+            const middleware = electricity.static('test/public', {
+                snockets: {
+                    async: true
+                }
+            });
+
+            const req = {
+                method: 'GET',
+                path: '/scripts/snockets/main.js'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/scripts/snockets/main-07bf096ceb205e7ed26ff09542642cd27d4140e4.js');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/scripts/snockets/main-concatenated.js', function(err, expected) {
+                                assert.ifError(err);
+                                assert.strictEqual(body, expected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+
+        describe('errors', function() {
+            let consoleWarn = console.warn;
+
+            before(function() {
+                console.warn = function() {};
+            });
+
+            it('should return file without concatenation on an error', function(done) {
+                const middleware = electricity.static('test/public');
+
+                const req = {
+                    get: function() {},
+                    method: 'GET',
+                    path: '/scripts/snockets/invalid-71f16629fe6cf3e982d38e87ab81c421e4956c8d.js'
+                };
+
+                const res = {
+                    send: function(body) {
+                        fs.readFile('test/public/scripts/snockets/invalid.js', function(err, expected) {
+                            assert.ifError(err);
+                            assert.strictEqual(body, expected.toString());
+                            done();
+                        });
+                    },
+                    set: function() {}
+                };
+
+                middleware(req, res);
+            });
+
+            it('should call next middleware with an error if the specified URL is too long', function(done) {
+                const middleware = electricity.static('test/public');
+
+                const req = {
+                    method: 'GET',
+                    path: `${crypto.randomBytes(256).toString('hex')}.js`
+                };
+
+                const next = function(err) {
+                    assert(err);
+                    done();
+                };
+
+                middleware(req, null, next);
+            });
+
+            after(function() {
+                console.warn = consoleWarn;
             });
         });
     });
