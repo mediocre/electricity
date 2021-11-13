@@ -633,6 +633,83 @@ describe('electricity.static', function() {
             });
         });
 
+        it('should watch for JavaScript file changes', function(done) {
+            this.timeout(3000);
+
+            const middleware = electricity.static('test/public', {
+                watch: { enabled: true }
+            });
+
+            fse.outputFile('test/public/watch/1.js', 'console.log(\'1\');', function() {
+                fse.outputFile('test/public/watch/main.js', '//= require 1.js', function() {
+                    setTimeout(function() {
+                        const req = {
+                            method: 'GET',
+                            path: '/watch/main.js'
+                        };
+
+                        const res = {
+                            redirect: function(path) {
+                                assert.strictEqual(path, '/watch/main-43ccd737a74cb7e71d4c5fbc9b5d7b9070bd60f5.js');
+
+                                const req = {
+                                    get: function() {},
+                                    method: 'GET',
+                                    path
+                                };
+
+                                const res = {
+                                    send: function(body) {
+                                        assert.strictEqual(body.toString(), 'console.log(\'1\');\n//= require 1.js');
+
+                                        fse.outputFile('test/public/watch/1.js', 'console.log(\'a\');', function() {
+                                            setTimeout(function() {
+                                                const req = {
+                                                    method: 'GET',
+                                                    path: '/watch/main.js'
+                                                };
+
+                                                const res = {
+                                                    redirect: function(path) {
+                                                        assert.strictEqual(path, '/watch/main-cc48db6444aad0423a485a7e7e9539f425adf637.js');
+
+                                                        const req = {
+                                                            get: function() {},
+                                                            method: 'GET',
+                                                            path
+                                                        };
+
+                                                        const res = {
+                                                            send: function(body) {
+                                                                assert.strictEqual(body.toString(), 'console.log(\'a\');\n//= require 1.js');
+                                                                done();
+                                                            },
+                                                            set: function() {}
+                                                        };
+
+                                                        middleware(req, res);
+                                                    },
+                                                    set: function() {}
+                                                };
+
+                                                middleware(req, res);
+                                            }, 1000);
+                                        });
+                                    },
+                                    set: function() {}
+                                };
+
+                                middleware(req, res);
+                            },
+                            set: function() {}
+                        };
+
+                        middleware(req, res);
+                    }, 1000);
+                });
+            });
+        });
+
         after(function(done) {
             fs.rm('test/public/watch', { recursive: true, force: true }, done);
         });
