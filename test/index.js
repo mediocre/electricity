@@ -78,7 +78,9 @@ describe('electricity.static', function() {
     describe('babel', function() {
         describe('preset-react', function() {
             it('should transform JSX files', function(done) {
-                const middleware = electricity.static('test/public');
+                const middleware = electricity.static('test/public', {
+                    babel: {}
+                });
 
                 const req = {
                     method: 'GET',
