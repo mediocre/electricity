@@ -79,7 +79,8 @@ describe('electricity.static', function() {
         describe('preset-react', function() {
             it('should transform JSX files', function(done) {
                 const middleware = electricity.static('test/public', {
-                    babel: {}
+                    babel: {},
+                    uglifyjs: { enabled: false }
                 });
 
                 const req = {
@@ -539,6 +540,9 @@ describe('electricity.static', function() {
             const middleware = electricity.static('test/public', {
                 snockets: {
                     async: true
+                },
+                uglifyjs: {
+                    enabled: false
                 }
             });
 
@@ -584,7 +588,9 @@ describe('electricity.static', function() {
             });
 
             it('should return file without concatenation on an error', function(done) {
-                const middleware = electricity.static('test/public');
+                const middleware = electricity.static('test/public', {
+                    uglifyjs: { enabled: false }
+                });
 
                 const req = {
                     get: function() {},
@@ -712,6 +718,7 @@ describe('electricity.static', function() {
             this.timeout(3000);
 
             const middleware = electricity.static('test/public', {
+                uglifyjs: { enabled: false },
                 watch: { enabled: true }
             });
 
