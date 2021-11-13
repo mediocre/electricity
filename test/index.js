@@ -2212,6 +2212,51 @@ describe('electricity.static', function() {
 
             middleware(req, res);
         });
+
+        it('should return original URL path when hashify is disabled', function(done) {
+            const middleware = electricity.static('test/public', {
+                hashify: false
+            });
+
+            const req = {
+                app: {
+                    locals: {}
+                },
+                get: function() {},
+                method: 'GET',
+                path: '/robots.txt'
+            };
+
+            const res = {
+                set: function() {},
+                send: function() {
+                    assert.strictEqual(req.app.locals.electricity.url('/robots.txt'), '/robots.txt');
+                    done();
+                }
+            };
+
+            middleware(req, res);
+        });
+
+        it('should return original URL path when the file could not be found', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const next = function() {
+                assert.strictEqual(req.app.locals.electricity.url('/not-found.txt'), '/not-found.txt');
+                done();
+            };
+
+            const req = {
+                app: {
+                    locals: {}
+                },
+                get: function() {},
+                method: 'GET',
+                path: '/not-found.txt'
+            };
+
+            middleware(req, null, next);
+        });
     });
 
     describe('snockets', function() {
