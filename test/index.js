@@ -75,6 +75,79 @@ describe('electricity.static', function() {
         middleware(req, null, next);
     });
 
+    describe('babel', function() {
+        describe('preset-react', function() {
+            it('should transform JSX files', function(done) {
+                const middleware = electricity.static('test/public');
+
+                const req = {
+                    method: 'GET',
+                    path: '/scripts/babel/preset-react.js'
+                };
+
+                const res = {
+                    redirect: function(path) {
+                        assert.strictEqual(path, '/scripts/babel/preset-react-b43ebe041bbcac2c692f07cae0b9e8d83e058de1.js');
+
+                        const req = {
+                            get: function() {},
+                            method: 'GET',
+                            path
+                        };
+
+                        const res = {
+                            send: function(body) {
+                                assert.strictEqual(body, 'React.render( /*#__PURE__*/React.createElement("h1", null, "Hello World"), document.body);');
+                                done();
+                            },
+                            set: function() {}
+                        };
+
+                        middleware(req, res);
+                    },
+                    set: function() {}
+                };
+
+                middleware(req, res);
+            });
+
+            describe('errors', function() {
+                let consoleWarn = console.warn;
+
+                before(function() {
+                    console.warn = function() {};
+                });
+
+                it('should return file without transformation on an error', function(done) {
+                    const middleware = electricity.static('test/public');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path: '/scripts/babel/invalid-50c332596d0947cd2cc8d126317bbbde753182d2.js'
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/scripts/babel/invalid.js', function(err, expected) {
+                                assert.ifError(err);
+                                assert.strictEqual(body, expected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                });
+
+                after(function() {
+                    console.warn = consoleWarn;
+                });
+            });
+        });
+    });
+
     describe('gzip', function() {
         it('should gzip TXT files for clients that accept gzip', function(done) {
             const middleware = electricity.static('test/public');
@@ -474,7 +547,7 @@ describe('electricity.static', function() {
 
             const res = {
                 redirect: function(path) {
-                    assert.strictEqual(path, '/scripts/snockets/main-07bf096ceb205e7ed26ff09542642cd27d4140e4.js');
+                    assert.strictEqual(path, '/scripts/snockets/main-c5418687251da9326c7b3c1e7ad7a8ac5d20943c.js');
 
                     const req = {
                         get: function() {},
@@ -650,7 +723,7 @@ describe('electricity.static', function() {
 
                         const res = {
                             redirect: function(path) {
-                                assert.strictEqual(path, '/watch/main-43ccd737a74cb7e71d4c5fbc9b5d7b9070bd60f5.js');
+                                assert.strictEqual(path, '/watch/main-5e80f4967926db5b960881010a344178dcf634ff.js');
 
                                 const req = {
                                     get: function() {},
@@ -660,7 +733,7 @@ describe('electricity.static', function() {
 
                                 const res = {
                                     send: function(body) {
-                                        assert.strictEqual(body.toString(), 'console.log(\'1\');\n//= require 1.js');
+                                        assert.strictEqual(body.toString(), 'console.log(\'1\'); //= require 1.js');
 
                                         fse.outputFile('test/public/watch/1.js', 'console.log(\'a\');', function() {
                                             setTimeout(function() {
@@ -671,7 +744,7 @@ describe('electricity.static', function() {
 
                                                 const res = {
                                                     redirect: function(path) {
-                                                        assert.strictEqual(path, '/watch/main-cc48db6444aad0423a485a7e7e9539f425adf637.js');
+                                                        assert.strictEqual(path, '/watch/main-e44a4d99d2e63d334edf6a5d19ece0645e306d91.js');
 
                                                         const req = {
                                                             get: function() {},
@@ -681,7 +754,7 @@ describe('electricity.static', function() {
 
                                                         const res = {
                                                             send: function(body) {
-                                                                assert.strictEqual(body.toString(), 'console.log(\'a\');\n//= require 1.js');
+                                                                assert.strictEqual(body.toString(), 'console.log(\'a\'); //= require 1.js');
                                                                 done();
                                                             },
                                                             set: function() {}
