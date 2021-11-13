@@ -2166,6 +2166,54 @@ describe('electricity.static', function() {
         });
     });
 
+    describe('locals', function() {
+        it('should register a helper function to generate URLs', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                app: {
+                    locals: {}
+                },
+                get: function() {},
+                method: 'GET',
+                path: '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt'
+            };
+
+            const res = {
+                set: function() {},
+                send: function() {
+                    assert.strictEqual(typeof req.app.locals.electricity.url, 'function');
+                    done();
+                }
+            };
+
+            middleware(req, res);
+        });
+
+        it('should return a hashified URL for a file that was previously requested', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                app: {
+                    locals: {}
+                },
+                get: function() {},
+                method: 'GET',
+                path: '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt'
+            };
+
+            const res = {
+                set: function() {},
+                send: function() {
+                    assert.strictEqual(req.app.locals.electricity.url('/robots.txt'), '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt');
+                    done();
+                }
+            };
+
+            middleware(req, res);
+        });
+    });
+
     describe('snockets', function() {
         it('should concatenate files', function(done) {
             const middleware = electricity.static('test/public', {
