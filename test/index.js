@@ -559,73 +559,77 @@ describe('electricity.static', function() {
         });
 
         it('should watch for file changes', function(done) {
+            this.timeout(3000);
+
             const middleware = electricity.static('test/public', {
                 watch: { enabled: true }
             });
 
             fse.outputFile('test/public/watch/foo', 'bar', function() {
-                const req = {
-                    method: 'GET',
-                    path: '/watch/foo'
-                };
+                setTimeout(function() {
+                    const req = {
+                        method: 'GET',
+                        path: '/watch/foo'
+                    };
 
-                const res = {
-                    redirect: function(path) {
-                        assert.strictEqual(path, '/watch/foo-62cdb7020ff920e5aa642c3d4066950dd1f01f4d');
+                    const res = {
+                        redirect: function(path) {
+                            assert.strictEqual(path, '/watch/foo-62cdb7020ff920e5aa642c3d4066950dd1f01f4d');
 
-                        const req = {
-                            get: function() {},
-                            method: 'GET',
-                            path
-                        };
+                            const req = {
+                                get: function() {},
+                                method: 'GET',
+                                path
+                            };
 
-                        const res = {
-                            send: function(body) {
-                                assert.strictEqual(body.toString(), 'bar');
+                            const res = {
+                                send: function(body) {
+                                    assert.strictEqual(body.toString(), 'bar');
 
-                                fse.outputFile('test/public/watch/foo', 'baz', function() {
-                                    setTimeout(function() {
-                                        const req = {
-                                            method: 'GET',
-                                            path: '/watch/foo'
-                                        };
+                                    fse.outputFile('test/public/watch/foo', 'baz', function() {
+                                        setTimeout(function() {
+                                            const req = {
+                                                method: 'GET',
+                                                path: '/watch/foo'
+                                            };
 
-                                        const res = {
-                                            redirect: function(path) {
-                                                assert.strictEqual(path, '/watch/foo-bbe960a25ea311d21d40669e93df2003ba9b90a2');
+                                            const res = {
+                                                redirect: function(path) {
+                                                    assert.strictEqual(path, '/watch/foo-bbe960a25ea311d21d40669e93df2003ba9b90a2');
 
-                                                const req = {
-                                                    get: function() {},
-                                                    method: 'GET',
-                                                    path
-                                                };
+                                                    const req = {
+                                                        get: function() {},
+                                                        method: 'GET',
+                                                        path
+                                                    };
 
-                                                const res = {
-                                                    send: function(body) {
-                                                        assert.strictEqual(body.toString(), 'baz');
-                                                        done();
-                                                    },
-                                                    set: function() {}
-                                                };
+                                                    const res = {
+                                                        send: function(body) {
+                                                            assert.strictEqual(body.toString(), 'baz');
+                                                            done();
+                                                        },
+                                                        set: function() {}
+                                                    };
 
-                                                middleware(req, res);
-                                            },
-                                            set: function() {}
-                                        };
+                                                    middleware(req, res);
+                                                },
+                                                set: function() {}
+                                            };
 
-                                        middleware(req, res);
-                                    }, 1000);
-                                });
-                            },
-                            set: function() {}
-                        };
+                                            middleware(req, res);
+                                        }, 1000);
+                                    });
+                                },
+                                set: function() {}
+                            };
 
-                        middleware(req, res);
-                    },
-                    set: function() {}
-                };
+                            middleware(req, res);
+                        },
+                        set: function() {}
+                    };
 
-                middleware(req, res);
+                    middleware(req, res);
+                }, 1000);
             });
         });
 
