@@ -12,7 +12,6 @@
     "uglifycss": "~0.0.29"
   },
   "devDependencies": {
-    "buffer-compare": "*",
     "coveralls": "*",
     "fs-extra": "*",
     "mocha": "*",

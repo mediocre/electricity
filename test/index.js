@@ -2,7 +2,6 @@ const assert = require('assert');
 const crypto = require('crypto');
 const fs = require('fs');
 
-const bufCompare = require('buffer-compare');
 const fse = require('fs-extra');
 
 const electricity = require('../lib/index');
