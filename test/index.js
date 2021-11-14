@@ -589,7 +589,8 @@ describe('electricity.static', function() {
 
             it('should return file without concatenation on an error', function(done) {
                 const middleware = electricity.static('test/public', {
-                    uglifyjs: { enabled: false }
+                    uglifyjs: { enabled: false },
+                    watch: { enabled: true }
                 });
 
                 const req = {
