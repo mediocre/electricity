@@ -1,0 +1,1 @@
+function add(n,d){return n+d}

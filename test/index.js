@@ -634,6 +634,45 @@ describe('electricity.static', function() {
         });
     });
 
+    describe('uglifyjs', function() {
+        it('should uglify files', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'GET',
+                path: '/scripts/uglifyjs/test.js'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/scripts/uglifyjs/test-bd0e73d5c4845f2f4c39219ae7e4248d122f0c5c.js');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/scripts/uglifyjs/test-result.js', function(err, expected) {
+                                assert.ifError(err);
+                                assert.strictEqual(body, expected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+    });
+
     describe('watch', function() {
         before(function(done) {
             fs.rm('test/public/watch', { recursive: true, force: true }, done);
