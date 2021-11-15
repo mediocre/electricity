@@ -153,7 +153,11 @@ describe('electricity.static', function() {
 
     describe('css', function() {
         it('should read .css files direcly from disk', function(done) {
-            const middleware = electricity.static('test/public');
+            const middleware = electricity.static('test/public', {
+                uglifycss: {
+                    enabled: false
+                }
+            });
 
             const req = {
                 method: 'GET',
@@ -173,7 +177,7 @@ describe('electricity.static', function() {
                     const res = {
                         send: function(body) {
                             fs.readFile('test/public/styles/test.css', function(err, expected) {
-                                assert(Buffer.compare(body, expected) === 0);
+                                assert.strictEqual(body, expected.toString());
                                 done();
                             });
                         },
@@ -592,7 +596,10 @@ describe('electricity.static', function() {
     describe('sass', function() {
         it('should read .scss files', function(done) {
             const middleware = electricity.static('test/public', {
-                sass: {}
+                sass: {},
+                uglifycss: {
+                    enabled: false
+                }
             });
 
             const req = {
@@ -726,6 +733,45 @@ describe('electricity.static', function() {
             after(function() {
                 console.warn = consoleWarn;
             });
+        });
+    });
+
+    describe('uglifycss', function() {
+        it('should uglify files', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'GET',
+                path: '/styles/uglifycss/test.css'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/styles/uglifycss/test-c08394f9bdad595e2e3a7c5e7851b41bd153204f.css');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/styles/uglifycss/test-result.css', function(err, expected) {
+                                assert.ifError(err);
+                                assert.strictEqual(body, expected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
         });
     });
 
