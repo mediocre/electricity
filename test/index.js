@@ -151,6 +151,60 @@ describe('electricity.static', function() {
         });
     });
 
+    describe('css', function() {
+        it('should read .css files direcly from disk', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'GET',
+                path: '/styles/test.css'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/styles/test-566c7e6edb86a4700f7f971fef877db61ffc4b43.css');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/styles/test.css', function(err, expected) {
+                                assert(Buffer.compare(body, expected) === 0);
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+
+        it('should call next middleware with an error if the specified URL is too long', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'GET',
+                path: `${crypto.randomBytes(256).toString('hex')}.css`
+            };
+
+            const next = function(err) {
+                assert(err);
+                done();
+            };
+
+            middleware(req, null, next);
+        });
+    });
+
     describe('gzip', function() {
         it('should gzip TXT files for clients that accept gzip', function(done) {
             const middleware = electricity.static('test/public');
