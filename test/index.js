@@ -591,6 +591,31 @@ describe('electricity.static', function() {
 
             middleware(req, null, next);
         });
+
+        it('should return an absolute URL when the hostname option is specified', function(done) {
+            const middleware = electricity.static('test/public', {
+                hostname: 'cdn.example.com'
+            });
+
+            const req = {
+                app: {
+                    locals: {}
+                },
+                get: function() {},
+                method: 'GET',
+                path: '/robots-423251d722a53966eb9368c65bfd14b39649105d.txt'
+            };
+
+            const res = {
+                set: function() {},
+                send: function() {
+                    assert.strictEqual(req.app.locals.electricity.url('/robots.txt'), 'https://cdn.example.com/robots-423251d722a53966eb9368c65bfd14b39649105d.txt');
+                    done();
+                }
+            };
+
+            middleware(req, res);
+        });
     });
 
     describe('sass', function() {
