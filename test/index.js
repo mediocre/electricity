@@ -589,6 +589,46 @@ describe('electricity.static', function() {
         });
     });
 
+    describe('sass', function() {
+        it('should read .scss files', function(done) {
+            const middleware = electricity.static('test/public', {
+                sass: {}
+            });
+
+            const req = {
+                method: 'GET',
+                path: '/styles/sass.css'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/styles/sass-72298afd35d449aa2d9a4b4acc6acf66ab14d91a.css');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/styles/sass-expected.css', function(err, expected) {
+                                assert.strictEqual(body, expected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+    });
+
     describe('snockets', function() {
         it('should concatenate files', function(done) {
             const middleware = electricity.static('test/public', {
