@@ -1039,6 +1039,64 @@ describe('electricity.static', function() {
             });
         });
 
+        it('should handle CSS file deletions', function(done) {
+            this.timeout(3000);
+
+            const middleware = electricity.static('test/public', {
+                uglifyjs: { enabled: false },
+                watch: { enabled: true }
+            });
+
+            fse.outputFile('test/public/watch/to-be-deleted.scss', 'p{color:red}', function() {
+                setTimeout(function() {
+                    const req = {
+                        method: 'GET',
+                        path: '/watch/to-be-deleted.css'
+                    };
+
+                    const res = {
+                        redirect: function(path) {
+                            assert.strictEqual(path, '/watch/to-be-deleted-6f8c504c70c088a326b9973c5e543784625c1a1d.css');
+
+                            const req = {
+                                get: function() {},
+                                method: 'GET',
+                                path
+                            };
+
+                            const res = {
+                                send: function(body) {
+                                    assert.strictEqual(body.toString(), 'p{color:red}');
+
+                                    fs.rm('test/public/watch/to-be-deleted.scss', function() {
+                                        setTimeout(function() {
+                                            const req = {
+                                                method: 'GET',
+                                                path: '/watch/to-be-deleted.css'
+                                            };
+
+                                            const next = function(err) {
+                                                assert(err);
+                                                done();
+                                            };
+
+                                            middleware(req, null, next);
+                                        }, 1000);
+                                    });
+                                },
+                                set: function() {}
+                            };
+
+                            middleware(req, res);
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                }, 1000);
+            });
+        });
+
         it('should watch for JavaScript file changes', function(done) {
             this.timeout(3000);
 
