@@ -14,18 +14,18 @@ But if you want to follow [Best Practices for Speeding Up Your Web Site](http://
 Typically, in an Express app you'd serve static files using the built-in middleware. Like this:
 
 ```javascript
-var express = require('express');
+const express = require('express');
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static('public'));
 ```
 
 To begin using Electricity simply replace the default static middleware:
 
 ```javascript
-var express = require('express');
-var electricity = require('electricity');
+const express = require('express');
+const electricity = require('electricity');
 
-app.use(electricity.static(__dirname + '/public'));
+app.use(electricity.static('public'));
 ```
 
 ## View Helper
@@ -38,7 +38,7 @@ You have access to this file name using a view helper method that builds URLs fo
 If you're using EJS it looks something like this:
 
 ```ejs
-<img src="<%= electricity.url('/apple-touch-icon-precomposed.png') %>" />
+<img src="<%= electricity.url('/images/image.png') %>" />
 <link href="<%= electricity.url('/styles/style.css') %>" rel="stylesheet" />
 <script src="<%= electricity.url('/scripts/script.js') %>"></script>
 ```
@@ -46,16 +46,16 @@ If you're using EJS it looks something like this:
 Which ultimately gets rendered as something like this:
 
 ```html
-<img src="/apple-touch-icon-precomposed-d131dd02c5e6eec4.png" />
-<link href="/styles/style-693d9a0698aff95c.css" rel="stylesheet" />
-<script src="/scripts/script-2fcab58712467eab.js"></script>
+<img src="/images/image-423251d722a53966eb9368c65bfd14b39649105d.png" />
+<link href="/styles/style-22a53914b39649105d66eb9368c65b423251d7fd.css" rel="stylesheet" />
+<script src="/scripts/script-5d66eb9368c22a53914b39d7fd6491065b423251.js"></script>
 ```
 
 ## Features
 
 Electricity comes with a variety of features to help make your web pages fast without the need to setup a complicated build process.
 
-- **HTTP Headers:** Electricity sets proper `Cache-Control`, `ETag`, `Expires`, and `Last-Modified` headers to help avoid unnecessary HTTP requests on subsequent page views.
+- **HTTP Headers:** Electricity sets proper `Cache-Control`, `ETag`, and `Expires`, headers to help avoid unnecessary HTTP requests on subsequent page views.
 - **Minification of JavaScript and CSS:** Electricity minifies JavaScript and CSS files in order to improve response time by reducing file sizes.
 - **Gzip:** Electricity gzips many content types (CSS, HTML, JavaScript, JSON, plaintext, XML) to reduce response sizes.
 - **Snockets:** Electricity supports Snockets (A JavaScript concatenation tool for Node.js inspired by Sprockets). You can use Snockets to combine multiple JavaScript files into a single JavaScript file which helps minimize HTTP requests.
@@ -69,17 +69,15 @@ Electricity comes with a variety of features to help make your web pages fast wi
 Default options look like this:
 
 ```javascript
-var options = {
+const options = {
+    babel: {},
     hashify: true,
     headers: {},
     hostname: '',
     sass: {},
     snockets: {},
     uglifyjs: {
-        enabled: true,
-        compress: {
-            sequences: false
-        }
+        enabled: true
     },
     uglifycss: {
         enabled: true
@@ -91,24 +89,30 @@ You can override the default options to look something like this:
 
 ```javascript
 var options = {
+    babel: { // Object passed straight to @babel/core options: https://babeljs.io/docs/en/options
+        generatorOpts: {
+            compact: false
+        },
+        parserOpts: {
+            errorRecovery: true
+        }
+    },
     hashify: false, // Do not generate hashes for URLs
-    headers: { 'Access-Control-Allow-Origin': 'http://foo.example' },
+    headers: { // Any additional headers you want a specify
+        'Access-Control-Allow-Origin': 'https://example.com'
+    },
     hostname: 'cdn.example.com', // CDN hostname
-    jsx: { // Object passed straight to react-tools options
-        ignore: ['raw', /donotcompile/] // Files to skip compilation on, can be a single argument to String.prototype.match or an array
-    }
     sass: { // Object passed straight to node-sass options
-        imagePath: '/images', // Image path for sass image-url helper
-        ignore: ['raw', /donotcompile/] // Files to skip compilation on, can be a single argument to String.prototype.match or an array
+        outputStyle: 'compressed',
+        quietDeps: true
     },
-    snockets: { // Object passed straight to snockets options
-        ignore: ['raw', /donotcompile/] // Files to skip compilation on, can be a single argument to String.prototype.match or an array
+    snockets: { // Object passed straight to snockets options: https://www.npmjs.com/package/snockets
     },
-    uglifyjs: { // Object passed straight to uglify-js options
-        enabled: true // Minify Javascript
+    uglifyjs: { // Object passed straight to uglify-js options: https://github.com/mishoo/UglifyJS#minify-options
+        enabled: false // Do not minify Javascript
     },
-    uglifycss: { // Object passed straight to uglifycss options
-        enabled: true // Minify CSS
+    uglifycss: { // Object passed straight to uglifycss options: https://github.com/fmarcia/uglifycss
+        enabled: false // Do not minify CSS
     }
 };
 ```
@@ -116,57 +120,57 @@ var options = {
 Pass options to the middleware like this:
 
 ```javascript
-app.use(electricity.static(__dirname + '/public', options));
+app.use(electricity.static('public', options));
 ```
 
 ## HTTP Headers
 
-Electricity sets proper `Cache-Control`, `ETag`, `Expires`, and `Last-Modified` headers to help avoid unnecessary HTTP requests on subsequent page views. If you'd like to specify literal values for specific HTTP headers you can set them in the `headers` option. This is useful if you need to specify a `Access-Control-Allow-Origin` header when loading fonts or JSON data off a CDN.
+Electricity sets proper `Cache-Control`, `ETag`, and `Expires` headers to help avoid unnecessary HTTP requests on subsequent page views. If you'd like to specify literal values for specific HTTP headers you can set them in the `headers` option. This is useful if you need to specify a `Access-Control-Allow-Origin` header when loading fonts or JSON data off a CDN.
 
 ```
-app.use(electricity.static(__dirname + '/public', {
+app.use(electricity.static('public', {
     headers: { 'Access-Control-Allow-Origin': '*' }
 }));
 ```
 
 ## CSS URI Values
 
-Electricity will automatically rewrite URIs in CSS to use MD5 hashes (if a matching file is found). For example:
+Electricity will automatically rewrite URIs in CSS to use SHA1 hashes (if a matching file is found). For example:
 
 ```css
-background-image: url(/apple-touch-icon-precomposed.png);
+background-image: url(/background.png);
 ```
 
 becomes this to allow caching and avoid unnecessary redirects:
 
 ```css
-background-image: url(/apple-touch-icon-precomposed-d131dd02c5e6eec4.png);
+background-image: url(/background-423251d722a53966eb9368c65bfd14b39649105d.png);
 ```
 
 ## CDN Hostname
 
 If you specify a hostname like this:
 ```javascript
-var express = require('express');
-var electricity = require('electricity');
+const express = require('express');
+const electricity = require('electricity');
 
-var options = {
+const options = {
     hostname: 'cdn.example.com'
 };
 
-app.use(electricity.static(__dirname + '/public'), options);
+app.use(electricity.static('public'), options);
 ```
 
 Then render URLs using the view helper like this:
 ```ejs
-<img src="<%= electricity.url('/apple-touch-icon-precomposed.png') %>" />
+<img src="<%= electricity.url('/images/image.png') %>" />
 <link href="<%= electricity.url('/styles/style.css') %>" rel="stylesheet" />
 <script src="<%= electricity.url('/scripts/script.js') %>"></script>
 ```
 
-Your HTML will ultimately get rendered using protocol-relative URLs like this:
+Your HTML will ultimately get rendered using absolute URLs like this:
 ```html
-<img src="//cdn.example.com/apple-touch-icon-precomposed-d131dd02c5e6eec4.png" />
-<link href="//cdn.example.com/styles/style-693d9a0698aff95c.css" rel="stylesheet" />
-<script src="//cdn.example.com/scripts/script-2fcab58712467eab.js"></script>
+<img src="https://cdn.example.com/images/image-423251d722a53966eb9368c65bfd14b39649105d.png" />
+<link href="https://cdn.example.com/styles/style-22a53914b39649105d66eb9368c65b423251d7fd.css" rel="stylesheet" />
+<script src="http://cdn.example.com/scripts/script-5d66eb9368c22a53914b39d7fd6491065b423251.js"></script>
 ```
