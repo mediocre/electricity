@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'FontAwesome';
+    src: url(/fonts/font-awesome/fontawesome-webfont.eot);
+    src: url('/fonts/font-awesome/fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+         url("/fonts/font-awesome/fontawesome-webfont.woff") format('woff'),
+         url(/fonts/font-awesome/fontawesome-webfont.ttf) format('truetype'),
+         url(/fonts/font-awesome/fontawesome-webfont.svg#webfont) format('svg');
+}
+
+body {
+    background-image: url(/apple-touch-icon-precomposed.png);
+    background-image: url(/not-found);
+    background-image: url(https://example.com/image.png);
+}

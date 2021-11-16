@@ -161,12 +161,12 @@ describe('electricity.static', function() {
 
             const req = {
                 method: 'GET',
-                path: '/styles/test.css'
+                path: '/styles/css/test.css'
             };
 
             const res = {
                 redirect: function(path) {
-                    assert.strictEqual(path, '/styles/test-566c7e6edb86a4700f7f971fef877db61ffc4b43.css');
+                    assert.strictEqual(path, '/styles/css/test-566c7e6edb86a4700f7f971fef877db61ffc4b43.css');
 
                     const req = {
                         get: function() {},
@@ -176,7 +176,7 @@ describe('electricity.static', function() {
 
                     const res = {
                         send: function(body) {
-                            fs.readFile('test/public/styles/test.css', function(err, expected) {
+                            fs.readFile('test/public/styles/css/test.css', function(err, expected) {
                                 assert.strictEqual(body, expected.toString());
                                 done();
                             });
@@ -206,6 +206,46 @@ describe('electricity.static', function() {
             };
 
             middleware(req, null, next);
+        });
+
+        it('should update URLs', function(done) {
+            const middleware = electricity.static('test/public', {
+                uglifycss: {
+                    enabled: false
+                }
+            });
+
+            const req = {
+                method: 'GET',
+                path: '/styles/urls/urls.css'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/styles/urls/urls-1099c397162ab5919b081f5f87482f0d76a11893.css');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/styles/urls/urls-expected.css', function(err, expected) {
+                                assert.strictEqual(body, expected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
         });
     });
 
@@ -629,12 +669,12 @@ describe('electricity.static', function() {
 
             const req = {
                 method: 'GET',
-                path: '/styles/sass.css'
+                path: '/styles/sass/sass.css'
             };
 
             const res = {
                 redirect: function(path) {
-                    assert.strictEqual(path, '/styles/sass-72298afd35d449aa2d9a4b4acc6acf66ab14d91a.css');
+                    assert.strictEqual(path, '/styles/sass/sass-72298afd35d449aa2d9a4b4acc6acf66ab14d91a.css');
 
                     const req = {
                         get: function() {},
@@ -644,7 +684,7 @@ describe('electricity.static', function() {
 
                     const res = {
                         send: function(body) {
-                            fs.readFile('test/public/styles/sass-expected.css', function(err, expected) {
+                            fs.readFile('test/public/styles/sass/sass-expected.css', function(err, expected) {
                                 assert.strictEqual(body, expected.toString());
                                 done();
                             });
@@ -689,7 +729,7 @@ describe('electricity.static', function() {
 
                     const res = {
                         send: function(body) {
-                            fs.readFile('test/public/scripts/snockets/main-concatenated.js', function(err, expected) {
+                            fs.readFile('test/public/scripts/snockets/main-expected.js', function(err, expected) {
                                 assert.ifError(err);
                                 assert.strictEqual(body, expected.toString());
                                 done();
@@ -782,7 +822,7 @@ describe('electricity.static', function() {
 
                     const res = {
                         send: function(body) {
-                            fs.readFile('test/public/styles/uglifycss/test-result.css', function(err, expected) {
+                            fs.readFile('test/public/styles/uglifycss/test-expected.css', function(err, expected) {
                                 assert.ifError(err);
                                 assert.strictEqual(body, expected.toString());
                                 done();
@@ -821,7 +861,7 @@ describe('electricity.static', function() {
 
                     const res = {
                         send: function(body) {
-                            fs.readFile('test/public/scripts/uglifyjs/test-result.js', function(err, expected) {
+                            fs.readFile('test/public/scripts/uglifyjs/test-expected.js', function(err, expected) {
                                 assert.ifError(err);
                                 assert.strictEqual(body, expected.toString());
                                 done();

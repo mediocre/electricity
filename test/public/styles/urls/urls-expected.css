@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'FontAwesome';
+    src: url(/fonts/font-awesome/fontawesome-webfont-d980c2ce873dc43af460d4d572d441304499f400.eot);
+    src: url(/fonts/font-awesome/fontawesome-webfont-d980c2ce873dc43af460d4d572d441304499f400.eot?#iefix) format('embedded-opentype'),
+         url(/fonts/font-awesome/fontawesome-webfont-28b782240b3e76db824e12c02754a9731a167527.woff) format('woff'),
+         url(/fonts/font-awesome/fontawesome-webfont-13b1eab65a983c7a73bc7997c479d66943f7c6cb.ttf) format('truetype'),
+         url(/fonts/font-awesome/fontawesome-webfont-98a8aa5cf7d62c2eff5f07ede8d844b874ef06ed.svg#webfont) format('svg');
+}
+
+body {
+    background-image: url(/apple-touch-icon-precomposed-217316d510b3122f64bd75f2dc0dcdba6c4786d5.png);
+    background-image: url(/not-found);
+    background-image: url(https://example.com/image.png);
+}
