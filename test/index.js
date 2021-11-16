@@ -959,6 +959,86 @@ describe('electricity.static', function() {
             });
         });
 
+        it('should watch for CSS file changes', function(done) {
+            this.timeout(3000);
+
+            const middleware = electricity.static('test/public', {
+                uglifyjs: { enabled: false },
+                watch: { enabled: true }
+            });
+
+            fse.outputFile('test/public/watch/2.scss', 'p{color:red}', function() {
+                fse.outputFile('test/public/watch/1.scss', '@import \'2\';', function() {
+                    fse.outputFile('test/public/watch/main.scss', '@import \'1\';', function() {
+                        setTimeout(function() {
+                            const req = {
+                                method: 'GET',
+                                path: '/watch/main.css'
+                            };
+
+                            const res = {
+                                redirect: function(path) {
+                                    assert.strictEqual(path, '/watch/main-6f8c504c70c088a326b9973c5e543784625c1a1d.css');
+
+                                    const req = {
+                                        get: function() {},
+                                        method: 'GET',
+                                        path
+                                    };
+
+                                    const res = {
+                                        send: function(body) {
+                                            assert.strictEqual(body.toString(), 'p{color:red}');
+
+                                            fse.outputFile('test/public/watch/2.scss', 'p{color:green}', function() {
+                                                setTimeout(function() {
+                                                    const req = {
+                                                        method: 'GET',
+                                                        path: '/watch/main.css'
+                                                    };
+
+                                                    const res = {
+                                                        redirect: function(path) {
+                                                            assert.strictEqual(path, '/watch/main-4746a8638dcba3d5afe18eef995e31623eb19d4c.css');
+
+                                                            const req = {
+                                                                get: function() {},
+                                                                method: 'GET',
+                                                                path
+                                                            };
+
+                                                            const res = {
+                                                                send: function(body) {
+                                                                    assert.strictEqual(body.toString(), 'p{color:green}');
+                                                                    done();
+                                                                },
+                                                                set: function() {}
+                                                            };
+
+                                                            middleware(req, res);
+                                                        },
+                                                        set: function() {}
+                                                    };
+
+                                                    middleware(req, res);
+                                                }, 1000);
+                                            });
+                                        },
+                                        set: function() {}
+                                    };
+
+                                    middleware(req, res);
+                                },
+                                set: function() {}
+                            };
+
+                            middleware(req, res);
+                        }, 1000);
+                    });
+                });
+            });
+        });
+
         it('should watch for JavaScript file changes', function(done) {
             this.timeout(3000);
 
@@ -967,72 +1047,74 @@ describe('electricity.static', function() {
                 watch: { enabled: true }
             });
 
-            fse.outputFile('test/public/watch/1.js', 'console.log(\'1\');', function() {
-                fse.outputFile('test/public/watch/main.js', '//= require 1.js', function() {
-                    setTimeout(function() {
-                        const req = {
-                            method: 'GET',
-                            path: '/watch/main.js'
-                        };
+            fse.outputFile('test/public/watch/2.js', 'console.log(\'foo\');', function() {
+                fse.outputFile('test/public/watch/1.js', '//= require 2.js', function() {
+                    fse.outputFile('test/public/watch/main.js', '//= require 1.js', function() {
+                        setTimeout(function() {
+                            const req = {
+                                method: 'GET',
+                                path: '/watch/main.js'
+                            };
 
-                        const res = {
-                            redirect: function(path) {
-                                assert.strictEqual(path, '/watch/main-5e80f4967926db5b960881010a344178dcf634ff.js');
+                            const res = {
+                                redirect: function(path) {
+                                    assert.strictEqual(path, '/watch/main-8c6a79ed3718fbe45d7e0d438ec5a2bb767ff8c8.js');
 
-                                const req = {
-                                    get: function() {},
-                                    method: 'GET',
-                                    path
-                                };
+                                    const req = {
+                                        get: function() {},
+                                        method: 'GET',
+                                        path
+                                    };
 
-                                const res = {
-                                    send: function(body) {
-                                        assert.strictEqual(body.toString(), 'console.log(\'1\'); //= require 1.js');
+                                    const res = {
+                                        send: function(body) {
+                                            assert.strictEqual(body.toString(), 'console.log(\'foo\'); //= require 2.js\n//= require 1.js');
 
-                                        fse.outputFile('test/public/watch/1.js', 'console.log(\'a\');', function() {
-                                            setTimeout(function() {
-                                                const req = {
-                                                    method: 'GET',
-                                                    path: '/watch/main.js'
-                                                };
+                                            fse.outputFile('test/public/watch/2.js', 'console.log(\'bar\');', function() {
+                                                setTimeout(function() {
+                                                    const req = {
+                                                        method: 'GET',
+                                                        path: '/watch/main.js'
+                                                    };
 
-                                                const res = {
-                                                    redirect: function(path) {
-                                                        assert.strictEqual(path, '/watch/main-e44a4d99d2e63d334edf6a5d19ece0645e306d91.js');
+                                                    const res = {
+                                                        redirect: function(path) {
+                                                            assert.strictEqual(path, '/watch/main-fa387bf84db36e790f09529c19cedf9a24897159.js');
 
-                                                        const req = {
-                                                            get: function() {},
-                                                            method: 'GET',
-                                                            path
-                                                        };
+                                                            const req = {
+                                                                get: function() {},
+                                                                method: 'GET',
+                                                                path
+                                                            };
 
-                                                        const res = {
-                                                            send: function(body) {
-                                                                assert.strictEqual(body.toString(), 'console.log(\'a\'); //= require 1.js');
-                                                                done();
-                                                            },
-                                                            set: function() {}
-                                                        };
+                                                            const res = {
+                                                                send: function(body) {
+                                                                    assert.strictEqual(body.toString(), 'console.log(\'bar\'); //= require 2.js\n//= require 1.js');
+                                                                    done();
+                                                                },
+                                                                set: function() {}
+                                                            };
 
-                                                        middleware(req, res);
-                                                    },
-                                                    set: function() {}
-                                                };
+                                                            middleware(req, res);
+                                                        },
+                                                        set: function() {}
+                                                    };
 
-                                                middleware(req, res);
-                                            }, 1000);
-                                        });
-                                    },
-                                    set: function() {}
-                                };
+                                                    middleware(req, res);
+                                                }, 1000);
+                                            });
+                                        },
+                                        set: function() {}
+                                    };
 
-                                middleware(req, res);
-                            },
-                            set: function() {}
-                        };
+                                    middleware(req, res);
+                                },
+                                set: function() {}
+                            };
 
-                        middleware(req, res);
-                    }, 1000);
+                            middleware(req, res);
+                        }, 1000);
+                    });
                 });
             });
         });
