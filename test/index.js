@@ -247,6 +247,47 @@ describe('electricity.static', function() {
 
             middleware(req, res);
         });
+
+        it('should update URLs and use a CDN', function(done) {
+            const middleware = electricity.static('test/public', {
+                hostname: 'cdn.example.com',
+                uglifycss: {
+                    enabled: false
+                }
+            });
+
+            const req = {
+                method: 'GET',
+                path: '/styles/urls/urls.css'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/styles/urls/urls-bfa1387489627e7e4798da8d3b83939b8d20dc91.css');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/styles/urls/urls-expected-cdn.css', function(err, expected) {
+                                assert.strictEqual(body, expected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
     });
 
     describe('gzip', function() {
