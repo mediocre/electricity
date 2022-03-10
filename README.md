@@ -91,7 +91,7 @@ You can override the default options to look something like this:
 var options = {
     babel: { // Object passed straight to @babel/core options: https://babeljs.io/docs/en/options
         generatorOpts: {
-            compact: false
+            compact: true
         },
         parserOpts: {
             errorRecovery: true
