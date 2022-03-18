@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2022-03-18
+### Changed
+- Resolve symlinks when looking for SASS dependants to remove from local cache.
+
 ## [3.0.0] - 2021-11-17
 ### Changed
 - Version 3.0.0 is a complete rewrite designed to improve application startup times by lazily processing files as they are requested (instead of eagerly processing all files at application start).
