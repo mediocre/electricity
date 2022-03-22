@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2022-03-22
+### Changed
+- Eagerly fetch all files in the specified directory (recursively) to help improve performance.
+
 ## [3.1.0] - 2022-03-18
 ### Changed
 - Resolve symlinks when looking for SASS dependants to remove from local cache.
