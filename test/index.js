@@ -288,6 +288,22 @@ describe('electricity.static', function() {
 
             middleware(req, res);
         });
+
+        it('should call next middleware when the specified file can not be found', function(done) {
+            const middleware = electricity.static('test/public');
+
+            const req = {
+                method: 'GET',
+                path: '/not-found.css'
+            };
+
+            const next = function(err) {
+                assert.ifError(err);
+                done();
+            };
+
+            middleware(req, null, next);
+        });
     });
 
     describe('gzip', function() {
@@ -1117,7 +1133,7 @@ describe('electricity.static', function() {
                                             };
 
                                             const next = function(err) {
-                                                assert(err);
+                                                assert.ifError(err);
                                                 done();
                                             };
 
