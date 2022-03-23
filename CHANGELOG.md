@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2022-03-23
+### Changed
+- Add option to disable gzip.
+
 ## [3.2.0] - 2022-03-22
 ### Changed
 - Eagerly fetch all files in the specified directory (recursively) to help improve performance.
