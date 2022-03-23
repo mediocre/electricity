@@ -377,6 +377,36 @@ describe('electricity.static', function() {
 
             middleware(req, res);
         });
+
+        it('should not gzip when disabled', function(done) {
+            const middleware = electricity.static('test/public', {
+                gzip: {
+                    enabled: false
+                }
+            });
+
+            const req = {
+                get: function() {},
+                headers: {
+                    'accept-encoding': 'gzip, deflate'
+                },
+                method: 'GET',
+                path: '/lorem-ipsum-1866425c51a663f0e9c1b8214c2ba186f6c827e4.txt'
+            };
+
+            const res = {
+                send: function() {
+                    done();
+                },
+                set: function(field, value) {
+                    if (field === 'content-encoding' && value === 'gzip') {
+                        assert.fail();
+                    }
+                }
+            };
+
+            middleware(req, res);
+        });
     });
 
     describe('hashify', function() {
