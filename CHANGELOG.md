@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2022-06-03
+### Changed
+- Bump sass from 1.32.13 to 1.52.2 which introduces this breaking change: https://sass-lang.com/documentation/breaking-changes/slash-div
+
 ## [3.3.0] - 2022-03-23
 ### Changed
 - Add option to disable gzip.
