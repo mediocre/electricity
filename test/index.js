@@ -806,7 +806,7 @@ describe('electricity.static', function() {
 
             const res = {
                 redirect: function(path) {
-                    assert.strictEqual(path, '/scripts/snockets/main-c5418687251da9326c7b3c1e7ad7a8ac5d20943c.js');
+                    assert.strictEqual(path, '/scripts/snockets/main-07bf096ceb205e7ed26ff09542642cd27d4140e4.js');
 
                     const req = {
                         get: function() {},
@@ -1203,7 +1203,7 @@ describe('electricity.static', function() {
 
                             const res = {
                                 redirect: function(path) {
-                                    assert.strictEqual(path, '/watch/main-8c6a79ed3718fbe45d7e0d438ec5a2bb767ff8c8.js');
+                                    assert.strictEqual(path, '/watch/main-37b45fa05d53a2f9c3677706b4bdf396e5e7547a.js');
 
                                     const req = {
                                         get: function() {},
