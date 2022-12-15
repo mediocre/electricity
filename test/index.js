@@ -1213,7 +1213,7 @@ describe('electricity.static', function() {
 
                                     const res = {
                                         send: function(body) {
-                                            assert.strictEqual(body.toString(), 'console.log(\'foo\'); //= require 2.js\n//= require 1.js');
+                                            assert.strictEqual(body.toString(), 'console.log(\'foo\');\n//= require 2.js\n//= require 1.js');
 
                                             fse.outputFile('test/public/watch/2.js', 'console.log(\'bar\');', function() {
                                                 setTimeout(function() {
@@ -1224,7 +1224,7 @@ describe('electricity.static', function() {
 
                                                     const res = {
                                                         redirect: function(path) {
-                                                            assert.strictEqual(path, '/watch/main-fa387bf84db36e790f09529c19cedf9a24897159.js');
+                                                            assert.strictEqual(path, '/watch/main-d6801be8ba05661e643b005280a2218a857866ab.js');
 
                                                             const req = {
                                                                 get: function() {},
@@ -1234,7 +1234,7 @@ describe('electricity.static', function() {
 
                                                             const res = {
                                                                 send: function(body) {
-                                                                    assert.strictEqual(body.toString(), 'console.log(\'bar\'); //= require 2.js\n//= require 1.js');
+                                                                    assert.strictEqual(body.toString(), 'console.log(\'bar\');\n//= require 2.js\n//= require 1.js');
                                                                     done();
                                                                 },
                                                                 set: function() {}
