@@ -12,10 +12,10 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.16.0]
+        node-version: [18.17.1]
 
     env:
-      DO_COVERALLS: 18.16.0
+      DO_COVERALLS: 18.17.1
 
     steps:
     - name: Setup Node ${{ matrix.node-version }}
