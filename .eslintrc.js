@@ -17,6 +17,7 @@ module.exports = {
         'no-fallthrough': 0,
         'no-inline-comments': 1,
         'no-trailing-spaces': 2,
+        'no-unused-vars': ['error', { 'caughtErrors': 'none' }],
         'object-curly-spacing': [2, 'always'],
         quotes: [2, 'single'],
         semi: [2, 'always']
