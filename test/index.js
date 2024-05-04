@@ -306,6 +306,48 @@ describe('electricity.static', function() {
         });
     });
 
+    describe('elm', function() {
+        it('should compile ELM files', function(done) {
+            const middleware = electricity.static('test/public', {
+                babel: {},
+                uglifyjs: { enabled: false }
+            });
+
+            const req = {
+                method: 'GET',
+                path: '/scripts/elm/Hello.elm'
+            };
+
+            const res = {
+                redirect: function(path) {
+                    assert.strictEqual(path, '/scripts/elm/Hello-532d8a10fefd123cbd0e4d70c1908dc81d6d185b.elm');
+
+                    const req = {
+                        get: function() {},
+                        method: 'GET',
+                        path
+                    };
+
+                    const res = {
+                        send: function(body) {
+                            fs.readFile('test/public/scripts/elm/Hello.elm', function(err, notExpected) {
+                                assert.ifError(err);
+                                assert.notStrictEqual(body, notExpected.toString());
+                                done();
+                            });
+                        },
+                        set: function() {}
+                    };
+
+                    middleware(req, res);
+                },
+                set: function() {}
+            };
+
+            middleware(req, res);
+        });
+    });
+
     describe('gzip', function() {
         it('should gzip TXT files for clients that accept gzip', function(done) {
             const middleware = electricity.static('test/public');
