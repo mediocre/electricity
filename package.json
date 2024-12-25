@@ -4,7 +4,7 @@
     "@babel/core": "~7.25.2",
     "@babel/preset-react": "~7.24.1",
     "chokidar": "~3.6.0",
-    "mime": "~3.0.0",
+    "mime": "~4.0.6",
     "negotiator": "~0.6.2",
     "sass": "~1.78.0",
     "sass-graph": "~4.0.0",
