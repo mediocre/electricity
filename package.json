@@ -3,7 +3,7 @@
   "dependencies": {
     "@babel/core": "~7.26.0",
     "@babel/preset-react": "~7.24.1",
-    "chokidar": "~3.6.0",
+    "chokidar": "~4.0.3",
     "mime": "~3.0.0",
     "negotiator": "~0.6.2",
     "sass": "~1.83.0",
