@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2025-01-15
+### Changed
+- Switch from `sass.renderSync` to `sass.compile`.
+
+## [3.5.1] - 2024-03-20
+### Changed
+- Bump chokidar from 3.5.0 to 3.6.0
+
 ## [3.5.0] - 2022-12-15
 ### Changed
 - Remove option to eagerly fetch all files in the specified directory (recursively).
