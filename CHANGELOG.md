@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.1] - 2025-01-21
+### Changed
+- Use `module: false` option to uglify-js. Version 3.18.0+ assume ES6 modules.
+
 ## [3.6.0] - 2025-01-15
 ### Changed
 - Switch from `sass.renderSync` to `sass.compile`.
