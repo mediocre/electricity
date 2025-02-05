@@ -90,7 +90,7 @@ describe('electricity.static', function() {
 
                 const res = {
                     redirect: function(path) {
-                        assert.strictEqual(path, '/scripts/babel/preset-react-b43ebe041bbcac2c692f07cae0b9e8d83e058de1.js');
+                        assert.strictEqual(path, '/scripts/babel/preset-react-50e821151e36c4b7e5c9b831e291df4aa1fb3164.js');
 
                         const req = {
                             get: function() {},
@@ -100,7 +100,7 @@ describe('electricity.static', function() {
 
                         const res = {
                             send: function(body) {
-                                assert.strictEqual(body, 'React.render( /*#__PURE__*/React.createElement("h1", null, "Hello World"), document.body);');
+                                assert.strictEqual(body, 'React.render(/*#__PURE__*/React.createElement("h1", null, "Hello World"), document.body);');
                                 done();
                             },
                             set: function() {}
