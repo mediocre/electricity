@@ -1,4 +1,4 @@
-name: build
+name: Test
 
 on:
   push:
@@ -12,10 +12,10 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.9.0]
+        node-version: [22.14.0]
 
     env:
-      DO_COVERALLS: 22.9.0
+      DO_COVERALLS: 22.14.0
 
     steps:
     - name: Setup Node ${{ matrix.node-version }}
