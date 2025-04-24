@@ -37,8 +37,6 @@ jobs:
 
     - name: Run ESLint
       run: eslint .
-      env:
-        ESLINT_USE_FLAT_CONFIG: false
 
     - name: run npm install
       run: npm install
