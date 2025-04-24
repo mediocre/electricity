@@ -1,1 +1,1 @@
-function add(n,d){return n+d}
+function add(n,d){return n+d;}

@@ -115,9 +115,11 @@ describe('electricity.static', function() {
             });
 
             describe('errors', function() {
+                //eslint-disable-next-line no-console
                 let consoleWarn = console.warn;
 
                 before(function() {
+                    //eslint-disable-next-line no-console
                     console.warn = function() {};
                 });
 
@@ -145,6 +147,7 @@ describe('electricity.static', function() {
                 });
 
                 after(function() {
+                    //eslint-disable-next-line no-console
                     console.warn = consoleWarn;
                 });
             });
@@ -834,9 +837,11 @@ describe('electricity.static', function() {
         });
 
         describe('errors', function() {
+            //eslint-disable-next-line no-console
             let consoleWarn = console.warn;
 
             before(function() {
+                //eslint-disable-next-line no-console
                 console.warn = function() {};
             });
 
@@ -883,6 +888,7 @@ describe('electricity.static', function() {
             });
 
             after(function() {
+                //eslint-disable-next-line no-console
                 console.warn = consoleWarn;
             });
         });

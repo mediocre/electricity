@@ -13,6 +13,8 @@
     "uglifycss": "~0.0.29"
   },
   "devDependencies": {
+    "@eslint/js": "*",
+    "globals": "*",
     "coveralls": "*",
     "fs-extra": "*",
     "mocha": "*",
