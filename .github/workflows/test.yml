@@ -37,7 +37,7 @@ jobs:
           npm test
         fi
 
-    - if: ${{ always() }}
+    - if: always()
       name: Send Slack notification
       run: |
         # Set common variables
