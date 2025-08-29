@@ -4,6 +4,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   test:
+    if: github.actor != 'dependabot[bot]'
     env:
       RUN_COVERAGE_FOR: 22.17.0
     runs-on: ubuntu-latest
