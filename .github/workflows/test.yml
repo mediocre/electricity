@@ -27,6 +27,9 @@ jobs:
     - name: Lint
       run: npx eslint .
 
+    - name: Install tools
+      run: npm install -g coveralls nyc
+
     - name: Test
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
