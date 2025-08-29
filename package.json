@@ -14,12 +14,9 @@
     "description": "An alternative to the built-in Express middleware for serving static files. Electricity follows a number of best practices for making web pages fast.",
     "devDependencies": {
         "@eslint/js": "*",
-        "coveralls": "*",
-        "eslint": "*",
         "fs-extra": "*",
         "globals": "*",
-        "mocha": "*",
-        "nyc": "*"
+        "mocha": "*"
     },
     "keywords": [
         "asset",
