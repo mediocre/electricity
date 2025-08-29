@@ -14,9 +14,10 @@
   },
   "devDependencies": {
     "@eslint/js": "*",
-    "globals": "*",
     "coveralls": "*",
+    "eslint": "*",
     "fs-extra": "*",
+    "globals": "*",
     "mocha": "*",
     "nyc": "*"
   },
@@ -31,7 +32,7 @@
   ],
   "main": "./lib",
   "name": "electricity",
-  "repository": "git://github.com/mediocre/electricity.git",
+  "repository": "https://github.com/mediocre/electricity.git",
   "scripts": {
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
     "test": "mocha --exit -R spec"

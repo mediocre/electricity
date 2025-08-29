@@ -1,21 +1,15 @@
 name: Test
 
-on:
-  push:
-    branches-ignore:
-    - 'dependabot**'
-  workflow_dispatch:
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   test:
+    env:
+      RUN_COVERAGE_FOR: 22.17.0
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [22.14.0]
-
-    env:
-      DO_COVERALLS: 22.14.0
+        node-version: [22.17.0]
 
     steps:
     - name: Setup Node ${{ matrix.node-version }}
@@ -23,74 +17,58 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Checkout from Git
+    - name: Checkout
       uses: actions/checkout@v2
-      with:
-        persist-credentials: false
-        token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Install ESLint and Mocha
-      run: npm install -g eslint mocha
-
-    - name: Install ESLine dependencies
-      run: npm install globals @eslint/js
-
-    - name: Run ESLint
-      run: eslint .
-
-    - name: run npm install
+    - name: Install dependencies
       run: npm install
 
-    - name: Run coverage report
-      run: |-
-        if [ "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
+    - name: Lint
+      run: npx eslint .
+
+    - name: Test
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: |
+        if [ "${{ matrix.node-version }}" == "${RUN_COVERAGE_FOR}" ]
         then
           npm run coveralls
         else
-          true
-        fi
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-
-    - name: Run without coverage report
-      run: |-
-        if [ ! "${{ matrix.node-version }}"x == "${DO_COVERALLS}"x ]
-        then
           npm test
-        else
-          true
         fi
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
-
-
-    - name: Notify Slack on success
-      if: ${{ success() }}
-      working-directory: ./${{ env.REPO_NAME }}
+    - if: ${{ always() }}
+      name: Send Slack notification
       run: |
-        GH_RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        # Set common variables
+        COMMIT_AUTHOR=$(git log -1 --format='%an' ${{ github.sha }} | sed "s/'/'\\\\''/g")
+        COMMIT_MSG=$(git log -1 --pretty=format:%s ${{ github.sha }} | sed "s/'/'\\\\''/g" | head -c 100)
         COMMIT_URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+        GH_RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-        SLACK_CHANNEL=$(echo "#${{ env.REPO_NAME }}" | sed 's/\./-/g')
-        COMMIT_AUTHOR=$(git log -1 --format='%an' ${{ github.sha }})
-        COMMIT_MSG=$(git log -1 --pretty=format:%s ${{ github.sha }})
+        SLACK_CHANNEL=$(echo "#${{ github.event.repository.name }}" | sed 's/\./-/g')
         
-        curl -X POST -H 'Content-type: application/json'           --data "{
+        # Set status-specific variables
+        if [ "${{ job.status }}" == "success" ]; then
+          HEADER_TEXT=":white_check_mark: Tests passed for ${{ github.event.repository.name }}"
+        else
+          HEADER_TEXT=":x: Tests failed for ${{ github.event.repository.name }}"
+        fi
+        
+        # Send Slack notification
+        curl -X POST -H 'Content-type: application/json' \
+          --data '{
             "blocks": [
               {
                 "text": {
-                  "text": ":white_check_mark: Tests passed for ${{ env.REPO_NAME }}",
+                  "text": "'"${HEADER_TEXT}"'",
                   "type": "plain_text"
                 },
                 "type": "header"
               },
               {
                 "text": {
-                  "text": "*Author:* ${COMMIT_AUTHOR}
-*Branch:* ${{ github.ref_name }}
-*Commit:* <${COMMIT_URL}|${SHORT_SHA}>
-*Message:* ${COMMIT_MSG}",
+                  "text": "*Author:* '"${COMMIT_AUTHOR}"'\n*Branch:* ${{ github.ref_name }}\n*Commit:* <'"${COMMIT_URL}"'|'"${SHORT_SHA}"'>\n*Message:* '"${COMMIT_MSG}"'",
                   "type": "mrkdwn"
                 },
                 "type": "section"
@@ -103,7 +81,7 @@ jobs:
                       "type": "plain_text"
                     },
                     "type": "button",
-                    "url": "https://coveralls.io/github/mediocre/${REPO_NAME}"
+                    "url": "https://coveralls.io/github/${{ github.repository }}"
                   },
                   {
                     "text": {
@@ -111,70 +89,13 @@ jobs:
                       "type": "plain_text"
                     },
                     "type": "button",
-                    "url": "${GH_RUN_URL}"
+                    "url": "'"${GH_RUN_URL}"'"
                   }
                 ],
                 "type": "actions"
               }
             ],
-            "channel": "${SLACK_CHANNEL}",
+            "channel": "'"${SLACK_CHANNEL}"'",
             "icon_url": "https://mercatalyst.com/apple-touch-icon.png",
             "username": "Mercatalyst"
-          }" ${{ secrets.SLACK_WEBHOOK_URL }}
-
-    - name: Notify Slack on failure
-      if: ${{ failure() }}
-      working-directory: ./${{ env.REPO_NAME }}
-      run: |
-        GH_RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        COMMIT_URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-        SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-        SLACK_CHANNEL=$(echo "#${{ env.REPO_NAME }}" | sed 's/\./-/g')
-        COMMIT_AUTHOR=$(git log -1 --format='%an' ${{ github.sha }})
-        COMMIT_MSG=$(git log -1 --pretty=format:%s ${{ github.sha }})
-        
-        curl -X POST -H 'Content-type: application/json'           --data "{
-            "blocks": [
-              {
-                "text": {
-                  "text": ":x: Tests failed for ${{ env.REPO_NAME }}",
-                  "type": "plain_text"
-                },
-                "type": "header"
-              },
-              {
-                "text": {
-                  "text": "*Author:* ${COMMIT_AUTHOR}
-*Branch:* ${{ github.ref_name }}
-*Commit:* <${COMMIT_URL}|${SHORT_SHA}>
-*Message:* ${COMMIT_MSG}",
-                  "type": "mrkdwn"
-                },
-                "type": "section"
-              },
-              {
-                "elements": [
-                  {
-                    "text": {
-                      "text": "Code Coverage",
-                      "type": "plain_text"
-                    },
-                    "type": "button",
-                    "url": "https://coveralls.io/github/mediocre/${REPO_NAME}"
-                  },
-                  {
-                    "text": {
-                      "text": "GitHub Action",
-                      "type": "plain_text"
-                    },
-                    "type": "button",
-                    "url": "${GH_RUN_URL}"
-                  }
-                ],
-                "type": "actions"
-              }
-            ],
-            "channel": "${SLACK_CHANNEL}",
-            "icon_url": "https://mercatalyst.com/apple-touch-icon.png",
-            "username": "Mercatalyst"
-          }" ${{ secrets.SLACK_WEBHOOK_URL }}
+          }' ${{ secrets.SLACK_WEBHOOK_URL }}
