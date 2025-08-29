@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         persist-credentials: false
-        ssh-key: ${{ secrets.MERCATALYST_DEPLOY_KEY }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install ESLint and Mocha
       run: npm install -g eslint mocha
