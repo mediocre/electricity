@@ -32,7 +32,7 @@
   ],
   "main": "./lib",
   "name": "electricity",
-  "repository": "https://github.com/mediocre/electricity.git",
+  "repository": "https://github.com/mediocre/electricity",
   "scripts": {
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
     "test": "mocha --exit -R spec"
