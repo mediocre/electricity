@@ -3,7 +3,7 @@
         "@babel/core": "~7.28.0",
         "@babel/preset-react": "~7.26.3",
         "chokidar": "~3.6.0",
-        "mime": "~3.0.0",
+        "mime": "~4.1.0",
         "negotiator": "~0.6.2",
         "sass": "~1.93.0",
         "sass-graph": "~4.0.0",
