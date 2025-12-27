@@ -6,11 +6,11 @@ jobs:
   test:
     if: github.actor != 'dependabot[bot]'
     env:
-      RUN_COVERAGE_FOR: 22.17.0
+      RUN_COVERAGE_FOR: 24.11.0
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.17.0]
+        node-version: [24.11.0]
 
     steps:
     - name: Setup Node ${{ matrix.node-version }}
